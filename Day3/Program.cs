@@ -17,7 +17,16 @@ if (amountOfRows != amountOfColumns) {
 }
 
 var sum = CalculatePartNumberSum(lines);
-Console.WriteLine("Sum of part numbers: " + sum);
+Console.WriteLine("Part 1:");
+Console.WriteLine("-------");
+Console.WriteLine($"Sum of part numbers: {sum}");
+
+Console.WriteLine();
+
+var gearRatioSum = CalculateGearRatioSum(lines);
+Console.WriteLine("Part 2:");
+Console.WriteLine("-------");
+Console.WriteLine($"Sum of gear ratios: {gearRatioSum}");
 
 return;
 
@@ -33,7 +42,6 @@ static int CalculatePartNumberSum(IReadOnlyList<string> schematic) {
                 var startIndex = FindStartIndexOfNumber(schematic[row], column);
                 var endIndex = FindEndIndexOfNumber(schematic[row], column);
 
-
                 // Extract the number substring and add to the sum
                 var numberString = schematic[row][startIndex..(endIndex + 1)];
                 sum += int.Parse(numberString);
@@ -45,6 +53,50 @@ static int CalculatePartNumberSum(IReadOnlyList<string> schematic) {
     }
 
     return sum;
+}
+
+static int CalculateGearRatioSum(IReadOnlyList<string> schematic) {
+    var sum = 0;
+    for (var row = 0; row < schematic.Count; row++) {
+        for (var column = 0; column < schematic[row].Length; column++) {
+            if (schematic[row][column] == '*') {
+                // Find two numbers adjacent to the * symbol
+                var adjacentNumbers = GetAdjacentNumbers(schematic, row, column).ToArray();
+                if (adjacentNumbers.Length == 2) {
+                    sum += adjacentNumbers[0] * adjacentNumbers[1];
+                }
+            }
+        }
+    }
+    return sum;
+}
+
+static HashSet<int> GetAdjacentNumbers(IReadOnlyList<string> schematics, int row, int col) {
+    var adjacentNumbers = new HashSet<int>(2);
+
+    // The direction offsets for rows and columns represent the eight possible directions (up, down, left, right, and diagonals)
+    int[] dr = {-1, -1, -1, 0, 0, 1, 1, 1}; // Direction offsets for rows
+    int[] dc = {-1, 0, 1, -1, 1, -1, 0, 1}; // Direction offsets for columns
+
+    for (var k = 0; k < 8; k++) {
+        var newRow = row + dr[k];
+        var newCol = col + dc[k];
+
+        // Check if the new position is within bounds
+        if (newRow >= 0 && newRow < schematics.Count &&
+            newCol >= 0 && newCol < schematics[newRow].Length) {
+            var adjacentChar = schematics[newRow][newCol];
+
+            // Check if the adjacent position contains a number
+            if (char.IsDigit(adjacentChar)) {
+                var startIndex = FindStartIndexOfNumber(schematics[newRow], newCol);
+                var endIndex = FindEndIndexOfNumber(schematics[newRow], newCol);
+                adjacentNumbers.Add(int.Parse(schematics[newRow][startIndex..(endIndex + 1)]));
+            }
+        }
+    }
+
+    return adjacentNumbers;
 }
 
 static bool IsAdjacentToSymbol(IReadOnlyList<string> schematic, int row, int col) {
