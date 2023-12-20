@@ -16,8 +16,7 @@ static void Part1(string[] lines) {
 	Console.WriteLine("-------");
 	
 	var almanac = new Almanac(lines);
-	almanac.InitializeRanges();
-	almanac.InitializeMaps();
+	almanac.Initialize();
 	//almanac.PrintMaps();
 	
 	almanac.PrintSeedsToLocations();
