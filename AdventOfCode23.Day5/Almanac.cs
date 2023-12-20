@@ -50,87 +50,31 @@ public class Almanac {
 		this.HumidityToLocationRanges.AddRange(GetRanges(139, 150));
 		
 		foreach (var seed in this.Seeds) {
-			foreach (var seedToSoilRange in this.SeedToSoilRanges) {
-				if (seed >= seedToSoilRange.SourceRangeStart && seed <= seedToSoilRange.SourceRangeStart + seedToSoilRange.RangeLength) {
-					this.SeedToSoilMaps.Add(new Map(seed, seedToSoilRange.DestinationRangeStart + (seed - seedToSoilRange.SourceRangeStart)));
-				}
-			}
-
-			if (this.SeedToSoilMaps.All(x => x.Source != seed)) {
-				this.SeedToSoilMaps.Add(new Map(seed, seed));
-			}
+			InitializeMap(seed, this.SeedToSoilRanges, this.SeedToSoilMaps);
 		}
 
 		foreach (var seedToSoilMap in this.SeedToSoilMaps) {
-			foreach (var soilToFertilizerRange in this.SoilToFertilizerRanges) {
-				if (seedToSoilMap.Destination >= soilToFertilizerRange.SourceRangeStart && seedToSoilMap.Destination <= soilToFertilizerRange.SourceRangeStart + soilToFertilizerRange.RangeLength) {
-					this.SoilToFertilizerMaps.Add(new Map(seedToSoilMap.Destination, soilToFertilizerRange.DestinationRangeStart + (seedToSoilMap.Destination - soilToFertilizerRange.SourceRangeStart)));
-				}
-			}
-
-			if (this.SoilToFertilizerMaps.All(x => x.Source != seedToSoilMap.Destination)) {
-				this.SoilToFertilizerMaps.Add(new Map(seedToSoilMap.Source, seedToSoilMap.Destination));
-			}
+			InitializeMap(seedToSoilMap.Destination, this.SoilToFertilizerRanges, this.SoilToFertilizerMaps);
 		}
 
 		foreach (var soilToFertilizerMap in this.SoilToFertilizerMaps) {
-			foreach (var fertilizerToWaterRange in this.FertilizerToWaterRanges) {
-				if (soilToFertilizerMap.Destination >= fertilizerToWaterRange.SourceRangeStart && soilToFertilizerMap.Destination <= fertilizerToWaterRange.SourceRangeStart + fertilizerToWaterRange.RangeLength) {
-					this.FertilizerToWaterMaps.Add(new Map(soilToFertilizerMap.Destination, fertilizerToWaterRange.DestinationRangeStart + (soilToFertilizerMap.Destination - fertilizerToWaterRange.SourceRangeStart)));
-				}
-			}
-
-			if (this.FertilizerToWaterMaps.All(x => x.Source != soilToFertilizerMap.Destination)) {
-				this.FertilizerToWaterMaps.Add(new Map(soilToFertilizerMap.Source, soilToFertilizerMap.Destination));
-			}
+			InitializeMap(soilToFertilizerMap.Destination, this.FertilizerToWaterRanges, this.FertilizerToWaterMaps);
 		}
 
 		foreach (var fertilizerToWaterMap in this.FertilizerToWaterMaps) {
-			foreach (var waterToLightRange in this.WaterToLightRanges) {
-				if (fertilizerToWaterMap.Destination >= waterToLightRange.SourceRangeStart && fertilizerToWaterMap.Destination <= waterToLightRange.SourceRangeStart + waterToLightRange.RangeLength) {
-					this.WaterToLightMaps.Add(new Map(fertilizerToWaterMap.Destination, waterToLightRange.DestinationRangeStart + (fertilizerToWaterMap.Destination - waterToLightRange.SourceRangeStart)));
-				}
-			}
-			
-			if (this.WaterToLightMaps.All(x => x.Source != fertilizerToWaterMap.Destination)) {
-				this.WaterToLightMaps.Add(new Map(fertilizerToWaterMap.Source, fertilizerToWaterMap.Destination));
-			}
+			InitializeMap(fertilizerToWaterMap.Destination, this.WaterToLightRanges, this.WaterToLightMaps);
 		}
 
 		foreach (var waterToLightMap in this.WaterToLightMaps) {
-			foreach (var lightToTemperatureRange in this.LightToTemperatureRanges) {
-				if (waterToLightMap.Destination >= lightToTemperatureRange.SourceRangeStart && waterToLightMap.Destination <= lightToTemperatureRange.SourceRangeStart + lightToTemperatureRange.RangeLength) {
-					this.LightToTemperatureMaps.Add(new Map(waterToLightMap.Destination, lightToTemperatureRange.DestinationRangeStart + (waterToLightMap.Destination - lightToTemperatureRange.SourceRangeStart)));
-				}
-			}
-
-			if (this.LightToTemperatureMaps.All(x => x.Source != waterToLightMap.Destination)) {
-				this.LightToTemperatureMaps.Add(new Map(waterToLightMap.Source, waterToLightMap.Destination));
-			}
+			InitializeMap(waterToLightMap.Destination, this.LightToTemperatureRanges, this.LightToTemperatureMaps);
 		}
 
 		foreach (var lightToTemperatureMap in this.LightToTemperatureMaps) {
-			foreach (var temperatureToHumidityRange in this.TemperatureToHumidityRanges) {
-				if (lightToTemperatureMap.Destination >= temperatureToHumidityRange.SourceRangeStart && lightToTemperatureMap.Destination <= temperatureToHumidityRange.SourceRangeStart + temperatureToHumidityRange.RangeLength) {
-					this.TemperatureToHumidityMaps.Add(new Map(lightToTemperatureMap.Destination, temperatureToHumidityRange.DestinationRangeStart + (lightToTemperatureMap.Destination - temperatureToHumidityRange.SourceRangeStart)));
-				}
-			}
-
-			if (this.TemperatureToHumidityMaps.All(x => x.Source != lightToTemperatureMap.Destination)) {
-				this.TemperatureToHumidityMaps.Add(new Map(lightToTemperatureMap.Source, lightToTemperatureMap.Destination));
-			}
+			InitializeMap(lightToTemperatureMap.Destination, this.TemperatureToHumidityRanges, this.TemperatureToHumidityMaps);
 		}
 
 		foreach (var temperatureToHumidityMap in this.TemperatureToHumidityMaps) {
-			foreach (var humidityToLocationRange in this.HumidityToLocationRanges) {
-				if (temperatureToHumidityMap.Destination >= humidityToLocationRange.SourceRangeStart && temperatureToHumidityMap.Destination <= humidityToLocationRange.SourceRangeStart + humidityToLocationRange.RangeLength) {
-					this.HumidityToLocationMaps.Add(new Map(temperatureToHumidityMap.Destination, humidityToLocationRange.DestinationRangeStart + (temperatureToHumidityMap.Destination - humidityToLocationRange.SourceRangeStart)));
-				}
-			}
-
-			if (this.HumidityToLocationMaps.All(x => x.Source != temperatureToHumidityMap.Destination)) {
-				this.HumidityToLocationMaps.Add(new Map(temperatureToHumidityMap.Source, temperatureToHumidityMap.Destination));
-			}
+			InitializeMap(temperatureToHumidityMap.Destination, this.HumidityToLocationRanges, this.HumidityToLocationMaps);
 		}
 	}
 
@@ -171,7 +115,7 @@ public class Almanac {
 
 		return lowestLocation;
 	}
-
+	
 	List<Ranges> GetRanges(int startIndex, int endIndex) {
 		var ranges = new List<Ranges>();
 		for (var i = startIndex; i < endIndex; i++) {
@@ -180,6 +124,17 @@ public class Almanac {
 		}
 
 		return ranges;
+	}
+	
+	static void InitializeMap(uint source, List<Ranges> ranges, List<Map> map) {
+		map.AddRange(from range in ranges 
+			where source >= range.SourceRangeStart && 
+			      source <= range.SourceRangeStart + range.RangeLength
+			select new Map(source, range.DestinationRangeStart + (source - range.SourceRangeStart)));
+
+		if (map.All(x => x.Source != source)) {
+			map.Add(new Map(source, source));
+		}
 	}
 }
 
