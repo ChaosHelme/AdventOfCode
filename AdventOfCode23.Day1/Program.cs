@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using Shared;
+using AdventOfCode23.Shared;
 
 var lines = FileHelper.ValidateAndReadInputFile("Input.txt");
 if (lines == null) {

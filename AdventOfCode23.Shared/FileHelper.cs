@@ -1,4 +1,4 @@
-﻿namespace Shared;
+﻿namespace AdventOfCode23.Shared;
 
 public static class FileHelper {
 	public static string[]? ValidateAndReadInputFile(string path) {
