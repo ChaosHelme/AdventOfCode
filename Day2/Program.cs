@@ -1,5 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
-var lines = File.ReadAllLines("Input.txt");
+using Shared;
+
+var lines = FileHelper.ValidateAndReadInputFile("Input.txt");
+if (lines == null) {
+	return;
+}
 var possibleGameIds = new List<int>();
 var gameCubePowers = new List<int>();
 

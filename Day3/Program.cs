@@ -1,11 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
-var lines = File.ReadAllLines("Input.txt");
+using Shared;
 
-if (lines.Length == 0) {
-	Console.WriteLine("No input");
-	return;
+var lines = FileHelper.ValidateAndReadInputFile("Input.txt");
+if (lines == null) {
+    return;
 }
-
 var amountOfRows = lines.Length;
 // We assume that all rows have the same amount of columns (which is the case for the input)
 var amountOfColumns = lines[0].Length;

@@ -1,6 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using Shared;
 
-var lines = File.ReadAllLines("Input.txt");
+var lines = FileHelper.ValidateAndReadInputFile("Input.txt");
+if (lines == null) {
+	return;
+}
 var numbers = new List<int>(lines.Length);
 char[] digits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
