@@ -2,7 +2,7 @@
 using AdventOfCode23.Day5;
 using AdventOfCode23.Shared;
 
-var lines = FileHelper.ValidateAndReadInputFile("Input.txt");
+var lines = FileHelper.ValidateAndReadInputFile("InputExample.txt");
 if (lines == null) {
 	return -1;
 }
@@ -17,7 +17,7 @@ static void Part1(string[] lines) {
 	
 	var almanac = new Almanac(lines);
 	almanac.Initialize();
-	//almanac.PrintMaps();
+	almanac.PrintMaps();
 	
 	almanac.PrintSeedsToLocations();
 	

@@ -1,28 +1,28 @@
 ﻿namespace AdventOfCode23.Day5;
 
 public class Almanac {
-	public uint[] Seeds { get; }
-	public List<Ranges> SeedToSoilRanges { get; }
-	public List<Ranges> SoilToFertilizerRanges { get; }
-	public List<Ranges> FertilizerToWaterRanges { get; }
-	public List<Ranges> WaterToLightRanges { get; }
-	public List<Ranges> LightToTemperatureRanges { get; }
-	public List<Ranges> TemperatureToHumidityRanges { get; }
-	public List<Ranges> HumidityToLocationRanges { get; }
+	Dictionary<uint, uint> SeedRanges { get; }
+	List<Ranges> SeedToSoilRanges { get; }
+	List<Ranges> SoilToFertilizerRanges { get; }
+	List<Ranges> FertilizerToWaterRanges { get; }
+	List<Ranges> WaterToLightRanges { get; }
+	List<Ranges> LightToTemperatureRanges { get; }
+	List<Ranges> TemperatureToHumidityRanges { get; }
+	List<Ranges> HumidityToLocationRanges { get; }
 
-	public List<Map> SeedToSoilMaps { get; }
-	public List<Map> SoilToFertilizerMaps { get; }
-	public List<Map> FertilizerToWaterMaps { get; }
-	public List<Map> WaterToLightMaps { get; }
-	public List<Map> LightToTemperatureMaps { get; }
-	public List<Map> TemperatureToHumidityMaps { get; }
-	public List<Map> HumidityToLocationMaps { get; set; }
+	Dictionary<uint, uint> SeedToSoilMaps { get; }
+	Dictionary<uint, uint> SoilToFertilizerMaps { get; }
+	Dictionary<uint, uint> FertilizerToWaterMaps { get; }
+	Dictionary<uint, uint> WaterToLightMaps { get; }
+	Dictionary<uint, uint> LightToTemperatureMaps { get; }
+	Dictionary<uint, uint> TemperatureToHumidityMaps { get; }
+	Dictionary<uint, uint> HumidityToLocationMaps { get; }
 
 	readonly string[] input;
 
 	public Almanac(string[] input) {
 		this.input = input;
-		this.Seeds = input[0][(input[0].IndexOf(':') + 2)..].Split(' ').Select(uint.Parse).ToArray();
+		this.SeedRanges = GetSeedRangesSorted();
 		this.SeedToSoilRanges = new List<Ranges>();
 		this.SoilToFertilizerRanges = new List<Ranges>();
 		this.FertilizerToWaterRanges = new List<Ranges>();
@@ -31,50 +31,63 @@ public class Almanac {
 		this.TemperatureToHumidityRanges = new List<Ranges>();
 		this.HumidityToLocationRanges = new List<Ranges>();
 		
-		this.SeedToSoilMaps = new List<Map>();
-		this.SoilToFertilizerMaps = new List<Map>();
-		this.FertilizerToWaterMaps = new List<Map>();
-		this.WaterToLightMaps = new List<Map>();
-		this.LightToTemperatureMaps = new List<Map>();
-		this.TemperatureToHumidityMaps = new List<Map>();
-		this.HumidityToLocationMaps = new List<Map>();
+		this.SeedToSoilMaps = new Dictionary<uint, uint>();
+		this.SoilToFertilizerMaps = new Dictionary<uint, uint>();
+		this.FertilizerToWaterMaps = new Dictionary<uint, uint>();
+		this.WaterToLightMaps = new Dictionary<uint, uint>();
+		this.LightToTemperatureMaps = new Dictionary<uint, uint>();
+		this.TemperatureToHumidityMaps = new Dictionary<uint, uint>();
+		this.HumidityToLocationMaps = new Dictionary<uint, uint>();
+	}
+	
+	Dictionary<uint, uint> GetSeedRangesSorted() {
+		var seedRanges = new Dictionary<uint, uint>();
+		var seedRangesString = this.input[0][(this.input[0].IndexOf(':') + 2)..].Split(' ');
+		for (var i = 0; i < seedRangesString.Length; i+=2) {
+			seedRanges.Add(uint.Parse(seedRangesString[i]), uint.Parse(seedRangesString[i +1]));
+		}
+		
+		return seedRanges.OrderBy(x=> x.Key).ToDictionary(x => x.Key, x => x.Value);
 	}
 	
 	public void Initialize() {
-		this.SeedToSoilRanges.AddRange(GetRanges(3, 13));
-		this.SoilToFertilizerRanges.AddRange(GetRanges(15, 31));
-		this.FertilizerToWaterRanges.AddRange(GetRanges(33, 48));
-		this.WaterToLightRanges.AddRange(GetRanges(50, 95));
-		this.LightToTemperatureRanges.AddRange(GetRanges(97, 112));
-		this.TemperatureToHumidityRanges.AddRange(GetRanges(114, 137));
-		this.HumidityToLocationRanges.AddRange(GetRanges(139, 150));
+		this.SeedToSoilRanges.AddRange(GetRanges("seed-to-soil map:").OrderBy(x => x.SourceRangeStart));
+		this.SoilToFertilizerRanges.AddRange(GetRanges("soil-to-fertilizer map:").OrderBy(x => x.SourceRangeStart));
+		this.FertilizerToWaterRanges.AddRange(GetRanges("fertilizer-to-water map:").OrderBy(x => x.SourceRangeStart));
+		this.WaterToLightRanges.AddRange(GetRanges("water-to-light map:").OrderBy(x => x.SourceRangeStart));
+		this.LightToTemperatureRanges.AddRange(GetRanges("light-to-temperature map:").OrderBy(x => x.SourceRangeStart));
+		this.TemperatureToHumidityRanges.AddRange(GetRanges("temperature-to-humidity map:").OrderBy(x => x.SourceRangeStart));
+		this.HumidityToLocationRanges.AddRange(GetRanges("humidity-to-location map:").OrderBy(x => x.SourceRangeStart));
 		
-		foreach (var seed in this.Seeds) {
-			InitializeMap(seed, this.SeedToSoilRanges, this.SeedToSoilMaps);
+		
+		foreach (var seedRange in this.SeedRanges) {
+			for (var seed = seedRange.Key; seed < seedRange.Key + seedRange.Value; seed++) {
+				InitializeMap(seed, this.SeedToSoilRanges, this.SeedToSoilMaps);
+			}
 		}
 
 		foreach (var seedToSoilMap in this.SeedToSoilMaps) {
-			InitializeMap(seedToSoilMap.Destination, this.SoilToFertilizerRanges, this.SoilToFertilizerMaps);
+			InitializeMap(seedToSoilMap.Value, this.SoilToFertilizerRanges, this.SoilToFertilizerMaps);
 		}
 
 		foreach (var soilToFertilizerMap in this.SoilToFertilizerMaps) {
-			InitializeMap(soilToFertilizerMap.Destination, this.FertilizerToWaterRanges, this.FertilizerToWaterMaps);
+			InitializeMap(soilToFertilizerMap.Value, this.FertilizerToWaterRanges, this.FertilizerToWaterMaps);
 		}
 
 		foreach (var fertilizerToWaterMap in this.FertilizerToWaterMaps) {
-			InitializeMap(fertilizerToWaterMap.Destination, this.WaterToLightRanges, this.WaterToLightMaps);
+			InitializeMap(fertilizerToWaterMap.Value, this.WaterToLightRanges, this.WaterToLightMaps);
 		}
 
 		foreach (var waterToLightMap in this.WaterToLightMaps) {
-			InitializeMap(waterToLightMap.Destination, this.LightToTemperatureRanges, this.LightToTemperatureMaps);
+			InitializeMap(waterToLightMap.Value, this.LightToTemperatureRanges, this.LightToTemperatureMaps);
 		}
 
 		foreach (var lightToTemperatureMap in this.LightToTemperatureMaps) {
-			InitializeMap(lightToTemperatureMap.Destination, this.TemperatureToHumidityRanges, this.TemperatureToHumidityMaps);
+			InitializeMap(lightToTemperatureMap.Value, this.TemperatureToHumidityRanges, this.TemperatureToHumidityMaps);
 		}
 
 		foreach (var temperatureToHumidityMap in this.TemperatureToHumidityMaps) {
-			InitializeMap(temperatureToHumidityMap.Destination, this.HumidityToLocationRanges, this.HumidityToLocationMaps);
+			InitializeMap(temperatureToHumidityMap.Value, this.HumidityToLocationRanges, this.HumidityToLocationMaps);
 		}
 	}
 
@@ -99,9 +112,15 @@ public class Almanac {
 	}
 
 	public void PrintSeedsToLocations() {
-		foreach (var humidityToLocationMap in this.HumidityToLocationMaps.Where(humidityToLocationMap => humidityToLocationMap.Destination > 0)) {
+		foreach (var humidityToLocationMap in this.HumidityToLocationMaps) {
+			var temperature = this.TemperatureToHumidityMaps.First(item => item.Value == humidityToLocationMap.Key);
+			var light = this.LightToTemperatureMaps.First(item => item.Value == temperature.Key);
+			var water = this.WaterToLightMaps.First(item => item.Value == light.Key);
+			var fertilizer = this.FertilizerToWaterMaps.First(item => item.Value == water.Key);
+			var soil = this.SoilToFertilizerMaps.First(item => item.Value == fertilizer.Key);
+			var seed = this.SeedToSoilMaps.First(item => item.Value == soil.Key);
 			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine($"Seed: {humidityToLocationMap.Source} -> Location: {humidityToLocationMap.Destination}");
+			Console.WriteLine($"Seed: {seed.Value} -> Location: {humidityToLocationMap.Value}");
 		}
 
 		Console.ResetColor();
@@ -109,14 +128,23 @@ public class Almanac {
 
 	public uint FindLowestLocation() {
 		var lowestLocation = uint.MaxValue;
-		foreach (var humidityToLocationMap in this.HumidityToLocationMaps.Where(humidityToLocationMap => humidityToLocationMap.Destination < lowestLocation)) {
-			lowestLocation = humidityToLocationMap.Destination;
+		foreach (var humidityToLocationMap in this.HumidityToLocationMaps.Where(humidityToLocationMap => humidityToLocationMap.Value < lowestLocation)) {
+			lowestLocation = humidityToLocationMap.Value;
 		}
 
 		return lowestLocation;
 	}
 	
-	List<Ranges> GetRanges(int startIndex, int endIndex) {
+	List<Ranges> GetRanges(string rangeIndicator) {
+		var startIndex = (from line in this.input where line.StartsWith(rangeIndicator) select Array.IndexOf(this.input, line) + 1).FirstOrDefault();
+		var endIndex = startIndex;
+		for (var i = startIndex; i < this.input.Length; i++) {
+			if (this.input[i].Trim() == string.Empty) {
+				endIndex = i;
+				break;
+			}	
+		}
+		
 		var ranges = new List<Ranges>();
 		for (var i = startIndex; i < endIndex; i++) {
 			var map = this.input[i].Split(' ').Select(uint.Parse).ToArray();
@@ -126,18 +154,15 @@ public class Almanac {
 		return ranges;
 	}
 	
-	static void InitializeMap(uint source, List<Ranges> ranges, List<Map> map) {
-		map.AddRange(from range in ranges 
-			where source >= range.SourceRangeStart && 
-			      source <= range.SourceRangeStart + range.RangeLength
-			select new Map(source, range.DestinationRangeStart + (source - range.SourceRangeStart)));
-
-		if (map.All(x => x.Source != source)) {
-			map.Add(new Map(source, source));
+	static void InitializeMap(uint source, List<Ranges> ranges, Dictionary<uint, uint> map) {
+		foreach (var range in ranges) {
+			if (source >= range.SourceRangeStart && source < range.SourceRangeStart + range.RangeLength) {
+				map.TryAdd(source, range.DestinationRangeStart + (source - range.SourceRangeStart));
+			}
 		}
+		
+		map.TryAdd(source, source);
 	}
 }
 
 public record struct Ranges(uint DestinationRangeStart, uint SourceRangeStart, uint RangeLength);
-
-public record struct Map(uint Source, uint Destination);
