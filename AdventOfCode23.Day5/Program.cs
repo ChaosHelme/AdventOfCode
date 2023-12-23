@@ -7,16 +7,9 @@ if (lines == null) {
 	return -1;
 }
 
-Part1(lines);
+var almanac = new Almanac(lines);
+almanac.InitializeRanges();
+	
+Console.WriteLine($"Lowest location: {almanac.ProcessAllSeeds()}");
 
 return 0;
-
-static void Part1(string[] lines) {
-	Console.WriteLine("Part 1:");
-	Console.WriteLine("-------");
-	
-	var almanac = new Almanac(lines);
-	almanac.InitializeRanges();
-	
-	Console.WriteLine($"Lowest location: {almanac.ProcessAllSeeds()}");
-}
