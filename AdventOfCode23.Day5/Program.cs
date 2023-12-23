@@ -16,10 +16,7 @@ static void Part1(string[] lines) {
 	Console.WriteLine("-------");
 	
 	var almanac = new Almanac(lines);
-	almanac.Initialize();
-	almanac.PrintMaps();
+	almanac.InitializeRanges();
 	
-	almanac.PrintSeedsToLocations();
-	
-	Console.WriteLine($"Lowest location: {almanac.FindLowestLocation()}");
+	Console.WriteLine($"Lowest location: {almanac.ProcessAllSeeds()}");
 }
