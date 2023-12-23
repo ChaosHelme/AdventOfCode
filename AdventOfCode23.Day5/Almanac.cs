@@ -85,7 +85,7 @@ public class Almanac {
 		var startIndex = (from line in this.input where line.StartsWith(rangeIndicator) select Array.IndexOf(this.input, line) + 1).FirstOrDefault();
 		var endIndex = startIndex;
 		for (var i = startIndex; i < this.input.Length; i++) {
-			if (this.input[i].Trim() == string.Empty) {
+			if (this.input[i].Trim() == string.Empty || i == this.input.Length - 1) {
 				endIndex = i;
 				break;
 			}	
