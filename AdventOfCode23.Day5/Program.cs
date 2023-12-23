@@ -2,7 +2,7 @@
 using AdventOfCode23.Day5;
 using AdventOfCode23.Shared;
 
-var lines = FileHelper.ValidateAndReadInputFile("InputExample.txt");
+var lines = FileHelper.ValidateAndReadInputFile("Input.txt");
 if (lines == null) {
 	return -1;
 }
