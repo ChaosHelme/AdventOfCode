@@ -7,9 +7,20 @@ if (lines == null) {
 	return -1;
 }
 
+var cancellationTokenSource = new CancellationTokenSource();
+
 var almanac = new Almanac(lines);
 almanac.InitializeRanges();
-	
-Console.WriteLine($"Lowest location: {almanac.ProcessAllSeeds()}");
+
+var startTime = DateTime.Now;
+Console.WriteLine($"Lowest location found synchronously: {almanac.ProcessAllSeeds()}");
+var endTime = DateTime.Now;
+Console.WriteLine($"Synchronous method ran {(endTime-startTime).TotalSeconds}s");
+
+startTime = DateTime.Now;
+var lowestLocation = await almanac.ProcessAllSeedsInParallelAsync(cancellationTokenSource.Token);
+Console.WriteLine($"Lowest location found asynchronously: {lowestLocation}");
+endTime = DateTime.Now;
+Console.WriteLine($"Asynchronous method ran {(endTime-startTime).TotalSeconds}s");
 
 return 0;

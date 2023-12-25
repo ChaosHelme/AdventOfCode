@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode23.Day5;
+﻿using System.Collections.Concurrent;
+
+namespace AdventOfCode23.Day5;
 
 public class Almanac {
 	Dictionary<long, long> SeedRanges { get; }
@@ -49,16 +51,30 @@ public class Almanac {
 		return this.lowestLocation;
 	}
 
-	public async Task<long> ProcessAllSeedsAsync() {
-		var tasks = new List<Task<long>>();
-
-		var results = await Task.WhenAll(tasks);
+	public async Task<long> ProcessAllSeedsInParallelAsync(CancellationToken cancellationToken) {
+		var results = new ConcurrentBag<long>();
+		
+		await Parallel.ForEachAsync(this.SeedRanges, cancellationToken, async (seedRange, cts) => {
+			var lowestLocation = await ProcessSeedRange(seedRange.Key, seedRange.Key + seedRange.Value, cts);	
+			results.Add(lowestLocation);
+		});
 
 		return results.Min();
 	}
-	
-	async Task<long> ProcessSeedRange(long start, long end) {
-		return await Task.FromResult(0);
+
+	async Task<long> ProcessSeedRange(long start, long end, CancellationToken cancellationToken) {
+		var lowestLocation = long.MaxValue;
+		
+		await Task.Run(() => {
+			for (var seed = start; seed <= end; seed++) {
+				var currentLocation = CalculateCurrentMinLocation(seed);
+				if (currentLocation < lowestLocation) {
+					lowestLocation = currentLocation;
+				}
+			}
+		}, cancellationToken);
+
+		return lowestLocation;
 	}
 
 	public void PrintRanges() {
