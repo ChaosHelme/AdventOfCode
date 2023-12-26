@@ -25,9 +25,13 @@ var handsAndBets = new List<(string, int)>(lines.Length);
 handsAndBets.AddRange(lines.Select(line => (line.Split(' ')[0], int.Parse(line.Split(' ')[1]))));
 
 SortHandsByWeight(cardsAndWeight, ref handsAndBets);
+var totalRanks = handsAndBets.Count;
+var totalWinnings = 0;
 foreach (var handAndBet in handsAndBets) {
-	Console.WriteLine($"Hand: {handAndBet.Item1} / Bet: {handAndBet.Item2}");
+	totalWinnings += totalRanks * handAndBet.Item2;
+	Console.WriteLine($"Hand: {handAndBet.Item1} / Bet: {handAndBet.Item2} / Rank: {totalRanks--}");
 }
+Console.WriteLine($"Total winnings: {totalWinnings}");
 
 return 0;
 
@@ -38,27 +42,22 @@ static void SortHandsByWeight(Dictionary<string, long> cardsAndWeight, ref List<
 		if (xMaxPairCount != yMaxPairCount) {
 			// Descending order of pair count
 			return yMaxPairCount.CompareTo(xMaxPairCount);
+		} 
+		if (xMaxPairCount == yMaxPairCount) {
+			return CompareHandsCardByCard(x.Item1, y.Item1, cardsAndWeight);
 		}
 
 		var xWeight = GetHandWeight(x.Item1, cardsAndWeight);
 		var yWeight = GetHandWeight(y.Item1, cardsAndWeight);
 
 		// Descending order of weight
-		var weightComparison = yWeight.CompareTo(xWeight);
-		if (weightComparison != 0) {
-			return weightComparison;
-		}
-
-		// Compare each card's weight in the hands
-		return CompareHandsCardByCard(x.Item1, y.Item1, cardsAndWeight);
+		return yWeight.CompareTo(xWeight);
 	});
 }
 
 static int CompareHandsCardByCard(string hand1, string hand2, Dictionary<string, long> cardsAndWeight) {
-	var hand1CardWeights = hand1.Select(card => cardsAndWeight[card.ToString()]).OrderByDescending(weight => weight)
-		.ToList();
-	var hand2CardWeights = hand2.Select(card => cardsAndWeight[card.ToString()]).OrderByDescending(weight => weight)
-		.ToList();
+	var hand1CardWeights = hand1.Select(card => cardsAndWeight[card.ToString()]).ToList();
+	var hand2CardWeights = hand2.Select(card => cardsAndWeight[card.ToString()]).ToList();
 
 	for (var i = 0; i < hand1CardWeights.Count; i++) {
 		var comparison = hand2CardWeights[i].CompareTo(hand1CardWeights[i]);
