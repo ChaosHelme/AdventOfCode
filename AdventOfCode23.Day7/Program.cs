@@ -5,26 +5,36 @@ if (lines == null) {
 	return -1;
 }
 
-var cardsAndWeight = new Dictionary<string, long> {
-	{ "A", 0xFFFFFFFFFFFF },
-	{ "K", 0x0FFFFFFFFFFF },
-	{ "Q", 0x00FFFFFFFFFF },
-	{ "J", 0x000FFFFFFFFF },
-	{ "T", 0x0000FFFFFFFF },
-	{ "9", 0x00000FFFFFFF },
-	{ "8", 0x000000FFFFFF },
-	{ "7", 0x0000000FFFFF },
-	{ "6", 0x00000000FFFF },
-	{ "5", 0x000000000FFF },
-	{ "4", 0x0000000000FF },
-	{ "3", 0x00000000000F },
-	{ "2", 0x000000000000 },
+var cardsAndWeight = new Dictionary<string, int> {
+	{ "A", 13 },
+	{ "K", 12 },
+	{ "Q", 11 },
+	{ "J", 10 },
+	{ "T", 9 },
+	{ "9", 8 },
+	{ "8", 7 },
+	{ "7", 6 },
+	{ "6", 5 },
+	{ "5", 4 },
+	{ "4", 3 },
+	{ "3", 2 },
+	{ "2", 1 },
+};
+
+var handScores = new Dictionary<string, int> {
+	["Five of a kind"] = 7,
+	["Four of a kind"] = 6,
+	["Full house"] = 5,
+	["Three of a kind"] = 4,
+	["Two pair"] = 3,
+	["One pair"] = 2,
+	["High card"] = 1
 };
 
 var handsAndBets = new List<(string, int)>(lines.Length);
 handsAndBets.AddRange(lines.Select(line => (line.Split(' ')[0], int.Parse(line.Split(' ')[1]))));
 
-SortHandsByWeight(cardsAndWeight, ref handsAndBets);
+SortCamelCardHands(ref handsAndBets, cardsAndWeight, handScores);
 var totalRanks = handsAndBets.Count;
 var totalWinnings = 0;
 foreach (var handAndBet in handsAndBets) {
@@ -35,27 +45,28 @@ Console.WriteLine($"Total winnings: {totalWinnings}");
 
 return 0;
 
-static void SortHandsByWeight(Dictionary<string, long> cardsAndWeight, ref List<(string, int)> handsAndBets) {
-	handsAndBets.Sort((x, y) => {
-		var xMaxPairCount = GetMaxPairCount(x.Item1);
-		var yMaxPairCount = GetMaxPairCount(y.Item1);
-		if (xMaxPairCount != yMaxPairCount) {
-			// Descending order of pair count
-			return yMaxPairCount.CompareTo(xMaxPairCount);
-		} 
-		if (xMaxPairCount == yMaxPairCount) {
-			return CompareHandsCardByCard(x.Item1, y.Item1, cardsAndWeight);
+static void SortCamelCardHands(ref List<(string, int)> handsAndBets, Dictionary<string, int> cardsAndWeight, Dictionary<string, int> handScores) {
+	handsAndBets.Sort((hand1, hand2) => {
+		var hand1Type = GetHandType(hand1.Item1);
+		var hand2Type = GetHandType(hand2.Item1);
+		var comparison = handScores[hand2Type].CompareTo(handScores[hand1Type]);
+		if (comparison != 0) {
+			return comparison;
 		}
 
-		var xWeight = GetHandWeight(x.Item1, cardsAndWeight);
-		var yWeight = GetHandWeight(y.Item1, cardsAndWeight);
+		if (hand1Type == hand2Type) {
+			return CompareHandsCardByCard(hand1.Item1, hand2.Item1, cardsAndWeight);
+		}
 
-		// Descending order of weight
-		return yWeight.CompareTo(xWeight);
+		// If hands are the same type, order by high card
+		var hand1Weight = GetHandWeight(hand1.Item1, cardsAndWeight);
+		var hand2Weight = GetHandWeight(hand2.Item1, cardsAndWeight);
+
+		return hand2Weight.CompareTo(hand1Weight);
 	});
 }
 
-static int CompareHandsCardByCard(string hand1, string hand2, Dictionary<string, long> cardsAndWeight) {
+static int CompareHandsCardByCard(string hand1, string hand2, Dictionary<string, int> cardsAndWeight) {
 	var hand1CardWeights = hand1.Select(card => cardsAndWeight[card.ToString()]).ToList();
 	var hand2CardWeights = hand2.Select(card => cardsAndWeight[card.ToString()]).ToList();
 
@@ -69,8 +80,28 @@ static int CompareHandsCardByCard(string hand1, string hand2, Dictionary<string,
 	return 0;
 }
 
-// Helper method to get the count of the most common card in a hand
-static int GetMaxPairCount(string hand) => hand.GroupBy(card => card).Max(group => group.Count());
-
 // Helper method to calculate the total weight of a hand
-static long GetHandWeight(string hand, Dictionary<string, long> cardsAndWeight) => hand.Sum(card => cardsAndWeight[card.ToString()]);
+static long GetHandWeight(string hand, Dictionary<string, int> cardsAndWeight) => hand.Sum(card => cardsAndWeight[card.ToString()]);
+
+static string GetHandType(string hand) {
+	var cardFrequencies = hand
+		.GroupBy(card => card)
+		.Select(group => group.Count())
+		.OrderByDescending(count => count)
+		.ToList();
+
+	switch (cardFrequencies.Count) {
+		case 5:
+			return "High card";
+		case 4:
+			return "One pair";
+		case 3:
+			return cardFrequencies.Contains(2) ? "Two pair" : "Three of a kind";
+		case 2:
+			return cardFrequencies.Contains(3) ? "Full house" : "Four of a kind";
+		case 1:
+			return "Five of a kind";
+		default:
+			throw new Exception("Invalid hand");
+	}
+}
