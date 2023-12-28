@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using AdventOfCode23.Shared;
+﻿using AdventOfCode23.Shared;
 
 var lines = FileHelper.ValidateAndReadInputFile("Input.txt");
 if (lines == null) {
@@ -16,8 +15,8 @@ Console.WriteLine($"Total steps: {steps}");
 
 return 0;
 
-static ConcurrentBag<string> FindElementsEndWithA(Dictionary<string, (string, string)> elements) {
-	var result = new ConcurrentBag<string>();
+static List<string> FindElementsEndWithA(Dictionary<string, (string, string)> elements) {
+	var result = new List<string>();
 	foreach (var element in elements) {
 		if (element.Key.EndsWith("A")) {
 			result.Add(element.Key);
@@ -26,7 +25,7 @@ static ConcurrentBag<string> FindElementsEndWithA(Dictionary<string, (string, st
 	return result;
 }
 
-static long GetTotalStepsForAllEndWithZ(List<Instruction> instructionSet, Dictionary<string, (string, string)> elements, ConcurrentBag<string> startElements) {
+static long GetTotalStepsForAllEndWithZ(List<Instruction> instructionSet, Dictionary<string, (string, string)> elements, List<string> startElements) {
 	var lengthList = new List<long>();
 	var visited = new List<string>();
 	foreach (var startElement in startElements) {
