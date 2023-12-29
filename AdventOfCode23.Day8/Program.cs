@@ -49,11 +49,7 @@ static long GetTotalStepsForAllEndWithZ(List<Instruction> instructionSet, Dictio
 }
 
 static long Gcd(long a, long b) {
-	if (b == 0) {
-		return a;
-	}
-
-	return Gcd(b, a % b);
+	return b == 0 ? a : Gcd(b, a % b);
 }
 
 static long Lcm(long a, long b) {

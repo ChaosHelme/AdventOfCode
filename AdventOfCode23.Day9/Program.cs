@@ -10,11 +10,14 @@ var sequenceExtrapolator = new SequenceExtrapolator();
 var sumOfAllNextValues = 0;
 foreach (var line in lines) {
     var sequence = line.Split(' ').Select(int.Parse).ToList();
-    var nextValue = sequenceExtrapolator.PredictNext(sequence);
+    
+    sequenceExtrapolator.BuildHistories(sequence);
+    
+    var nextValue = sequenceExtrapolator.PredictNext();
     sumOfAllNextValues += nextValue;
     
     Console.WriteLine($"The predicted next value for the history {line} is: {nextValue}");
-    sequenceExtrapolator.PrintDifferences(sequence);
+    sequenceExtrapolator.PrintHistories();
 }
 
 Console.WriteLine($"The sum of all extrapolated values is: {sumOfAllNextValues}");
