@@ -35,6 +35,22 @@ public class SequenceExtrapolator {
         return nextValue;
     }
 
+    public int PredictPrevious() {
+        // Ensure Histories is properly populated and isn't empty
+        if (this.Histories == null || !this.Histories.Any()) {
+            throw new InvalidOperationException("Histories is not populated. Make sure to call BuildHistories and pass the sequence list before calling PredictPrevious");
+        }
+
+        var previousValue = 0;
+
+        // Iterate from last to first sequence in Histories
+        for (var i = this.Histories.Count - 1; i >= 0; i--) {
+            previousValue += this.Histories[i].First(); // Add the first value of the sequence to previousValue
+        }
+
+        return previousValue;
+    }
+
     public void PrintHistories() {
         var indentation = 0;
         foreach (var history in this.Histories) {

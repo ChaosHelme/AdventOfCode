@@ -14,9 +14,10 @@ foreach (var line in lines) {
     sequenceExtrapolator.BuildHistories(sequence);
     
     var nextValue = sequenceExtrapolator.PredictNext();
+    var previousValue = sequenceExtrapolator.PredictPrevious();
     sumOfAllNextValues += nextValue;
     
-    Console.WriteLine($"The predicted next value for the history {line} is: {nextValue}");
+    Console.WriteLine($"The predicted next value for the history {line} is: {nextValue} the previous value is: {previousValue}");
     sequenceExtrapolator.PrintHistories();
 }
 
