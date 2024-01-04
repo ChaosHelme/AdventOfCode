@@ -11,4 +11,10 @@
       <ProjectReference Include="..\AdventOfCode23.Shared\AdventOfCode23.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Input.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
