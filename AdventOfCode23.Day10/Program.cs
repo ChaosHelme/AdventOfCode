@@ -11,18 +11,19 @@ var pipePath = new PipePath(lines);
 var stopWatch = new Stopwatch();
 
 stopWatch.Start();
-var giantLoop = pipePath.FindGiantLoop();
+var longestLoop = pipePath.FindLongestLoop();
 stopWatch.Stop();
 
-if (giantLoop == null) {
+if (longestLoop == null) {
 	Console.ForegroundColor = ConsoleColor.Red;
 	Console.Error.WriteLine("No giant loop found.");
 	return Int32.MinValue;
 }
 
-Console.WriteLine($"Giant loop containing {giantLoop.Count} pipes found in {stopWatch.Elapsed.TotalMilliseconds} ms.");
+Console.WriteLine($"Giant loop containing {longestLoop.Count} pipes found in {stopWatch.Elapsed.TotalMilliseconds} ms.");
 
-stopWatch.Reset();
+pipePath.PrintLongestLoopInGrid(longestLoop);
+Console.WriteLine($"First pipe position: {longestLoop[0]} - Last pipe position: {longestLoop[^1]}");
 
 
 
