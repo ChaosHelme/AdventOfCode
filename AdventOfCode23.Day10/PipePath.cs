@@ -63,7 +63,7 @@ public class PipePath(string[] pipeGrid) {
 					Console.ForegroundColor = ConsoleColor.Black;	
 				}
 				
-				Console.Write($"{pipeGrid[row][col]}");
+				Console.Write($"{ConvertToDisplaySymbol(pipeGrid[row][col])}");
 			}
 
 			Console.WriteLine();
@@ -121,6 +121,27 @@ public class PipePath(string[] pipeGrid) {
 		return '.'; // Ground (no pipe)
 	}
 
+	static char ConvertToDisplaySymbol(char originalSymbol) {
+		switch (originalSymbol) {
+			case '|':
+				return '│'; // Vertical pipe
+			case '-':
+				return '─'; // Horizontal pipe
+			case 'L':
+				return '└'; // 90-degree bend connecting north and east
+			case 'J':
+				return '┘'; // 90-degree bend connecting north and west
+			case '7':
+				return '┐'; // 90-degree bend connecting south and west
+			case 'F':
+				return '┌'; // 90-degree bend connecting south and east
+			case '.':
+				return '·'; // Ground (no pipe)
+			default:
+				return originalSymbol; // Leave other characters unchanged
+		}
+	}
+
 	static bool IsPipe(char symbol) => symbol == '|' || symbol == '-' || symbol == 'L' || symbol == 'J' ||
 	                                   symbol == '7' || symbol == 'F';
 
@@ -159,7 +180,7 @@ public class PipePath(string[] pipeGrid) {
 		var visited = new bool[rows, cols];
 		var loop = new List<(int, int)>();
 
-		var stack = new Stack<(int, int)>(rows*cols);
+		var stack = new Stack<(int, int)>();
 		stack.Push((startRow, startCol));
 
 		while (stack.Count > 0) {
