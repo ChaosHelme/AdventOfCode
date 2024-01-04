@@ -17,28 +17,7 @@ public class PipePath(string[] pipeGrid) {
 		West,
 	}
 
-	public void PrintLongestLoopInGrid(List<(int, int)> longestPath) {
-		for (var row = 0; row < pipeGrid.Length; row++) {
-			var line = pipeGrid[row];
-			for (var col = 0; col < line.Length; col++) {
-				var index = longestPath.IndexOf((row, col));
-				if (index >= 0) {
-					Console.ForegroundColor = ConsoleColor.Green;
-					Console.Write($"{(index == 0 ? 'S' : pipeGrid[row][col])}");
-					Console.ResetColor();
-					continue;
-				}
-
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.Write($"{pipeGrid[row][col]}");
-				Console.ResetColor();
-			}
-
-			Console.WriteLine();
-		}
-	}
-
-	public List<(int, int)>? FindLongestLoop() {
+	public List<(int, int)>? FindLoop() {
 		var rows = pipeGrid.Length;
 		var cols = pipeGrid[0].Length;
 
@@ -57,12 +36,72 @@ public class PipePath(string[] pipeGrid) {
 		return DFS(pipeGrid, start.Item1, start.Item2);
 	}
 
+	public (int, int, int) FindFarthestPipeWithDistance(List<(int, int)> loop) {
+		// Find the farthest pipe from the start position by simply iterating over the loop
+		// And compare the distance from the start position to the current pipe with the farthest distance
+		var farthestPipe = (-1, -1);
+		var maxDistance = int.MinValue;
+
+		foreach (var pipe in loop) {
+			var distance = CalculateManhattanDistance(loop[0].Item1, loop[0].Item2, pipe.Item1, pipe.Item2);
+
+			if (distance > maxDistance) {
+				maxDistance = distance;
+				farthestPipe = pipe;
+			}
+		}
+		
+		var steps = FindStepsToFarthestPipe(loop, farthestPipe);
+
+		return (farthestPipe.Item1, farthestPipe.Item2, steps);
+	}
+
+	int FindStepsToFarthestPipe(List<(int, int)> loop, (int, int) farthestPipe) {
+		for (var step = 0; step < loop.Count; step++) {
+			if (loop[step] == farthestPipe) {
+				return step;
+			}
+		}
+
+		return int.MinValue;
+	}
+	
+	public void PrintLoopInGrid(List<(int, int)> longestPath) {
+		PrintLoopInGridHighlightingFarthestPipe(longestPath, (-1, -1));
+	}
+
+	public void PrintLoopInGridHighlightingFarthestPipe(List<(int, int)> longestPath, (int, int) farthestPipe) {
+		for (var row = 0; row < pipeGrid.Length; row++) {
+			var line = pipeGrid[row];
+			for (var col = 0; col < line.Length; col++) {
+				var index = longestPath.IndexOf((row, col));
+				if (index >= 0) {
+					if (index == 0) {
+						Console.ForegroundColor = ConsoleColor.Blue;
+					} else if (row == farthestPipe.Item1 && col == farthestPipe.Item2) {
+						Console.ForegroundColor = ConsoleColor.Magenta;
+					}
+					else {
+						Console.ForegroundColor = ConsoleColor.DarkGreen;	
+					}
+				} else {
+					Console.ForegroundColor = ConsoleColor.DarkGray;	
+				}
+				
+				Console.Write($"{pipeGrid[row][col]}");
+			}
+
+			Console.WriteLine();
+		}
+		Console.ResetColor();
+	}
+
 	(int, int) FindStartingPosition(int rows, int cols) {
 		// We can use a simple linear search to find the starting position since the grid is 140x140
-		for (var i = 0; i < rows; i++) {
-			for (var j = 0; j < cols; j++) {
-				if (pipeGrid[i][j] == 'S') {
-					return (i, j);
+		for (var row = 0; row < rows; row++) {
+			for (var col = 0; col < cols; col++) {
+				if (pipeGrid[row][col] == 'S') {
+					return (row, col);
 				}
 			}
 		}
@@ -136,7 +175,14 @@ public class PipePath(string[] pipeGrid) {
 				return false; // Unknown pipe type
 		}
 	}
+	
+	// See https://en.wikipedia.org/wiki/Manhattan_distance
+	static int CalculateManhattanDistance(int x1, int y1, int x2, int y2) {
+		return Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
+	}
 
+	// Depth-first search
+	// https://en.wikipedia.org/wiki/Depth-first_search
 	static List<(int, int)> DFS(string[] pipeGrid, int startRow, int startCol) {
 		var rows = pipeGrid.Length;
 		var cols = pipeGrid[0].Length;

@@ -11,20 +11,22 @@ var pipePath = new PipePath(lines);
 var stopWatch = new Stopwatch();
 
 stopWatch.Start();
-var longestLoop = pipePath.FindLongestLoop();
+var loop = pipePath.FindLoop();
 stopWatch.Stop();
 
-if (longestLoop == null) {
+if (loop == null) {
 	Console.ForegroundColor = ConsoleColor.Red;
-	Console.Error.WriteLine("No giant loop found.");
+	Console.Error.WriteLine("No loop found.");
 	return Int32.MinValue;
 }
 
-Console.WriteLine($"Giant loop containing {longestLoop.Count} pipes found in {stopWatch.Elapsed.TotalMilliseconds} ms.");
+Console.WriteLine($"Loop containing {loop.Count} pipes found in {stopWatch.Elapsed.TotalMilliseconds} ms.");
 
-pipePath.PrintLongestLoopInGrid(longestLoop);
-Console.WriteLine($"First pipe position: {longestLoop[0]} - Last pipe position: {longestLoop[^1]}");
+var farthestPipe = pipePath.FindFarthestPipeWithDistance(loop);
+pipePath.PrintLoopInGridHighlightingFarthestPipe(loop, (farthestPipe.Item1, farthestPipe.Item2));
 
+Console.WriteLine($"First pipe position: {loop[0]} - Last pipe position: {loop[^1]}");
+Console.WriteLine($"The farthest pipe is at position {farthestPipe} with a distance of {farthestPipe.Item3} steps from the start position.");
 
 
 
