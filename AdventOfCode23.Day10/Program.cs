@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using AdventOfCode23.Day10;
+﻿using AdventOfCode23.Day10;
 using AdventOfCode23.Shared;
 
 var lines = FileHelper.ValidateAndReadInputFile("Input.txt");
@@ -8,11 +7,8 @@ if (lines == null) {
 }
 
 var pipePath = new PipePath(lines);
-var stopWatch = new Stopwatch();
 
-stopWatch.Start();
 var loop = pipePath.FindLoop();
-stopWatch.Stop();
 
 if (loop == null) {
 	Console.ForegroundColor = ConsoleColor.Red;
@@ -20,28 +16,41 @@ if (loop == null) {
 	return Int32.MinValue;
 }
 
-Console.WriteLine($"Loop containing {loop.Count} pipes found in {stopWatch.Elapsed.TotalMilliseconds} ms.");
+Console.WriteLine($"Loop containing {loop.Count} pipes found.");
 
-var farthestPipe = pipePath.FindFarthestPipeWithDistance(loop);
+var farthestPipe = pipePath.FindFarthestPipe(loop);
 pipePath.PrintLoopInGridHighlightingFarthestPipe(loop, (farthestPipe.Item1, farthestPipe.Item2));
 
 Console.WriteLine($"First pipe position: {loop[0]} - Last pipe position: {loop[^1]}");
 Console.WriteLine($"The farthest pipe is at position {farthestPipe} with a distance of {farthestPipe.Item3} steps from the start position.");
 
 
-
-// stopWatch.Start();
-// var longestLoop = pipePath.FindLongestLoop();
-// stopWatch.Start();
-// if (longestLoop != null) {
-// 	pipePath.MarkLongestPathInGrid(longestLoop);
-// 	//pipePath.PrintGrid();
-// 	Console.WriteLine($"Longest loop found with a length of {longestLoop.Count} in {stopWatch.Elapsed.TotalSeconds} s.");
-// }
-// else
-// {
-// 	Console.WriteLine("No loop found.");
+// Console.WriteLine("\nYou can check if a given pipe is in the loop by inputting its position in the grid.");
+// Console.WriteLine("Enter 'q' to quit.");
+//
+// while (true) {
+// 	if (!TryGetUserInput(out var row, "Enter row") || !TryGetUserInput(out var column, "Enter column")) {
+// 		break;
+// 	}
+//
+// 	if (Int32.TryParse(row, out var rowNumber) && Int32.TryParse(column, out var columnNumber)) {
+// 		var pipe = (rowNumber, columnNumber);
+// 		var index = loop.IndexOf(pipe);
+// 		if (index >= 0) {
+// 			Console.WriteLine($"Pipe at position {pipe} is in the loop at index {index}");
+// 		} else {
+// 			Console.WriteLine($"Pipe at position {pipe} is not in the loop.");
+// 		}
+// 	}
 // }
 
 
 return 0;
+
+
+static bool TryGetUserInput(out string userInput, string prompt) {
+	Console.Write($"{prompt}: ");
+	userInput = Console.ReadLine();
+
+	return !userInput.ToLower().Equals("q");
+}

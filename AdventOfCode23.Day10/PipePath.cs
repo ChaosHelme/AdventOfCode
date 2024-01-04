@@ -35,35 +35,10 @@ public class PipePath(string[] pipeGrid) {
 		// Call DFS for the starting position
 		return DFS(pipeGrid, start.Item1, start.Item2);
 	}
-
-	public (int, int, int) FindFarthestPipeWithDistance(List<(int, int)> loop) {
-		// Find the farthest pipe from the start position by simply iterating over the loop
-		// And compare the distance from the start position to the current pipe with the farthest distance
-		var farthestPipe = (-1, -1);
-		var maxDistance = int.MinValue;
-
-		foreach (var pipe in loop) {
-			var distance = CalculateManhattanDistance(loop[0].Item1, loop[0].Item2, pipe.Item1, pipe.Item2);
-
-			if (distance > maxDistance) {
-				maxDistance = distance;
-				farthestPipe = pipe;
-			}
-		}
-		
-		var steps = FindStepsToFarthestPipe(loop, farthestPipe);
-
-		return (farthestPipe.Item1, farthestPipe.Item2, steps);
-	}
-
-	int FindStepsToFarthestPipe(List<(int, int)> loop, (int, int) farthestPipe) {
-		for (var step = 0; step < loop.Count; step++) {
-			if (loop[step] == farthestPipe) {
-				return step;
-			}
-		}
-
-		return int.MinValue;
+	
+	public (int, int, int) FindFarthestPipe(List<(int, int)> loop) {
+		// The farthest pipe is simply the pipe in the middle of the loop
+		return (loop[loop.Count/2].Item1, loop[loop.Count/2].Item2, loop.Count / 2);
 	}
 	
 	public void PrintLoopInGrid(List<(int, int)> longestPath) {
@@ -79,13 +54,13 @@ public class PipePath(string[] pipeGrid) {
 					if (index == 0) {
 						Console.ForegroundColor = ConsoleColor.Blue;
 					} else if (row == farthestPipe.Item1 && col == farthestPipe.Item2) {
-						Console.ForegroundColor = ConsoleColor.Magenta;
+						Console.ForegroundColor = ConsoleColor.Red;
 					}
 					else {
 						Console.ForegroundColor = ConsoleColor.DarkGreen;	
 					}
 				} else {
-					Console.ForegroundColor = ConsoleColor.DarkGray;	
+					Console.ForegroundColor = ConsoleColor.Black;	
 				}
 				
 				Console.Write($"{pipeGrid[row][col]}");
@@ -174,11 +149,6 @@ public class PipePath(string[] pipeGrid) {
 			default:
 				return false; // Unknown pipe type
 		}
-	}
-	
-	// See https://en.wikipedia.org/wiki/Manhattan_distance
-	static int CalculateManhattanDistance(int x1, int y1, int x2, int y2) {
-		return Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
 	}
 
 	// Depth-first search
