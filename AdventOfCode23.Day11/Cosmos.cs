@@ -53,6 +53,21 @@ public class Cosmos {
 			}
 		}
 	}
+	
+	public int SumOfShortestDistanceBetweenUniverseCombinations() {
+		var sumOfDistances = 0;
+		// Calculate the shortest distance between each universe combination
+		for (var i = 0; i < this.universes.Count; i++) {
+			var universe1 = this.universes[i];
+			for (var j = i + 1; j < this.universes.Count; j++) {
+				var universe2 = this.universes[j];
+				var distance = Math.Abs(universe1.Row - universe2.Row) + Math.Abs(universe1.Column - universe2.Column);
+				sumOfDistances += distance;
+			}
+		}
+
+		return sumOfDistances;
+	}
 
 	public long CalculateUniqueCombinationsOfUniverses() {
 		return CalculateCombinations(this.universes.Count, 2);
