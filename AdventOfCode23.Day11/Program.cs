@@ -26,4 +26,6 @@ cosmos.AssignUniqueNumberToUniverses();
 Console.WriteLine($"\nCombination of universes: {cosmos.CalculateUniqueCombinationsOfUniverses()}");
 Console.WriteLine($"\nSum of all shortest distance between universe combinations: {cosmos.SumOfShortestDistanceBetweenUniverseCombinations()}");
 
+cosmos.PrintShortestDistanceBetweenUniverseCombinations();
+
 return 0;

@@ -24,6 +24,45 @@ public class Cosmos {
 			WriteLineWithColoredLetter(line, '#', ConsoleColor.Green);
 		}
 	}
+	
+	public void PrintUniverses() {
+		foreach (var universe in this.universes) {
+			Console.WriteLine($"Universe {universe.UniverseId} at ({universe.Row}, {universe.Column})");
+			foreach (var partnerId in universe.PartnerUniverseIds) {
+				Console.WriteLine($"  Partner {partnerId}");
+			}
+		}
+	}
+	
+	public void PrintShortestDistanceBetweenUniverseCombinations() {
+		Console.WriteLine("\nShortest distance between universe combinations:");
+		// Print the whole cosmos with the shortest distance between each universe combination
+		var rows = this.expandedCosmos.Count;
+		var cols = this.expandedCosmos[0].Length;
+
+		for (var row = 0; row < rows; row++) {
+			var line = this.expandedCosmos[row];
+			for (var col = 0; col < cols; col++) {
+				var c = line[col];
+				if (c == '#') {
+					var universe = this.universes.First(t => t.Row == row && t.Column == col);
+					Console.ForegroundColor = ConsoleColor.Green;
+					Console.Write(universe.UniverseId);
+				} else {
+					var step = this.universes.SelectMany(u => u.Steps).FirstOrDefault(t => t.Row == row && t.Column == col);
+					if (step.Row != 0 && step.Column != 0) {
+						Console.ForegroundColor = ConsoleColor.Yellow;
+						Console.Write('#');
+					} else {
+						Console.ResetColor();
+						Console.Write(c);
+					}
+				}
+			}
+			Console.ResetColor();
+			Console.WriteLine();
+		}
+	}
     
 	public (int, int) ExpandCosmos() {
     	var expandedColumns = ExpandColumns(this.expandedCosmos);
@@ -47,15 +86,30 @@ public class Cosmos {
 
 			for (var col = 0; col < line.Length; col++) {
 				if (line[col] == '#') {
-					this.universes.Add(new Universe(row, col, universeNumber));
+					this.universes.Add(new Universe(universeNumber, row, col, new List<int>(), new List<Step>()));
 					universeNumber++;
 				}
+			}
+		}
+
+		for (var i = 0; i < this.universes.Count; i++) {
+			var startUniverse = this.universes[i];
+			for (var j = i+1; j < this.universes.Count; j++) {
+				var endUniverse = this.universes[j];
+				startUniverse.PartnerUniverseIds.Add(endUniverse.UniverseId);
+				endUniverse.PartnerUniverseIds.Add(startUniverse.UniverseId);
+				TraverseSteps(startUniverse, endUniverse);
 			}
 		}
 	}
 	
 	public int SumOfShortestDistanceBetweenUniverseCombinations() {
 		var sumOfDistances = 0;
+		foreach (var universe in this.universes) {
+			foreach (var partnerUniverseId in universe.PartnerUniverseIds) {
+				
+			}
+		}
 		// Calculate the shortest distance between each universe combination
 		for (var i = 0; i < this.universes.Count; i++) {
 			var universe1 = this.universes[i];
@@ -69,14 +123,32 @@ public class Cosmos {
 		return sumOfDistances;
 	}
 
-	public long CalculateUniqueCombinationsOfUniverses() {
-		return CalculateCombinations(this.universes.Count, 2);
+	void TraverseSteps(Universe startUniverse, Universe endUniverse) {
+		// Traverse the steps between the two universes
+		var row = startUniverse.Row;
+		var col = startUniverse.Column;
+		var steps = new List<Step>();
+		while (row != endUniverse.Row || col != endUniverse.Column) {
+			if (row < endUniverse.Row) {
+				row++;
+				steps.Add(new Step(row, col));
+			} else if (row > endUniverse.Row) {
+				row--;
+				steps.Add(new Step(row, col));
+			} else if (col < endUniverse.Column) {
+				col++;
+				steps.Add(new Step(row, col));
+			} else if (col > endUniverse.Column) {
+				col--;
+				steps.Add(new Step(row, col));
+			}
+		}
+
+		startUniverse.Steps.AddRange(steps);
 	}
 
-	public void PrintUniverses() {
-		foreach (var universe in this.universes) {
-			Console.WriteLine($"Universe {universe.Number} at ({universe.Row}, {universe.Column})");
-		}
+	public long CalculateUniqueCombinationsOfUniverses() {
+		return CalculateCombinations(this.universes.Count, 2);
 	}
 	
 	// Use combination formula to calculate the amount of combinations
@@ -151,5 +223,3 @@ public class Cosmos {
     	return expandedRows;
     }
 }
-
-record struct Universe(int Row, int Column, int Number);
