@@ -21,4 +21,9 @@ cosmos.PrintExpandedCosmos();
 
 Console.WriteLine($"\nAmount of universes: {cosmos.CountAmountOfUniverse()}");
 
+cosmos.AssignUniqueNumberToUniverses();
+cosmos.PrintUniverses();
+
+Console.WriteLine($"\nCombination of universes: {cosmos.CalculateUniqueCombinationsOfUniverses()}");
+
 return 0;

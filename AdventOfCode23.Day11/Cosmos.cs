@@ -5,10 +5,12 @@ namespace AdventOfCode23.Day11;
 public class Cosmos {
 	readonly IReadOnlyList<string> originalCosmos;
 	readonly List<string> expandedCosmos;
+	readonly List<Universe> universes;
 
 	public Cosmos(IReadOnlyList<string> originalCosmos) {
 		this.originalCosmos = originalCosmos;
 		this.expandedCosmos = this.originalCosmos.ToList();
+		this.universes = new List<Universe>();
 	}
 
 	public void PrintOriginalCosmos() {
@@ -32,6 +34,52 @@ public class Cosmos {
 
 	public int CountAmountOfUniverse() {
 		return this.originalCosmos.SelectMany(t => t).Count(t => t == '#');
+	}
+
+	public void AssignUniqueNumberToUniverses() {
+		// Assign a unique number to each universe (#-Symbol)
+		var universeNumber = 1;
+		for (var row = 0; row < this.expandedCosmos.Count; row++) {
+			var line = this.expandedCosmos[row];
+			if (!line.Contains('#')) {
+				continue;
+			}
+
+			for (var col = 0; col < line.Length; col++) {
+				if (line[col] == '#') {
+					this.universes.Add(new Universe(row, col, universeNumber));
+					universeNumber++;
+				}
+			}
+		}
+	}
+
+	public long CalculateUniqueCombinationsOfUniverses() {
+		return CalculateCombinations(this.universes.Count, 2);
+	}
+
+	public void PrintUniverses() {
+		foreach (var universe in this.universes) {
+			Console.WriteLine($"Universe {universe.Number} at ({universe.Row}, {universe.Column})");
+		}
+	}
+	
+	// Use combination formula to calculate the amount of combinations
+	// https://en.wikipedia.org/wiki/Combination
+	// In order to prevent overflow, we cancel out common factors
+	static long CalculateCombinations(int n, int k) {
+		// Ensure k is not greater than n
+		k = Math.Min(k, n - k);
+
+		long result = 1;
+
+		// Calculate C(n, k) by canceling out common factors
+		for (var i = 0; i < k; i++) {
+			result *= (n - i);
+			result /= (i + 1);
+		}
+
+		return result;
 	}
 	
 	static void WriteLineWithColoredLetter(string letters, char c, ConsoleColor color) {
@@ -88,3 +136,5 @@ public class Cosmos {
     	return expandedRows;
     }
 }
+
+record struct Universe(int Row, int Column, int Number);
