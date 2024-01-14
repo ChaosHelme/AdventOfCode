@@ -1,8 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using AdventOfCode23.Shared;
 
-var lines = FileHelper.ValidateAndReadInputFile("Input.txt");
-if (lines == null) {
+var lines = await FileHelper.ValidateAndReadInputFileAsync("Input.txt");
+if (lines.Length < 1) {
 	return;
 }
 var numbers = new List<int>(lines.Length);
