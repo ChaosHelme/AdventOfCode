@@ -12,14 +12,14 @@ public class Cosmos {
 	}
 
 	public void PrintOriginalCosmos() {
-    	foreach (var line in this.originalCosmos) {
-    		Console.WriteLine(line);
-    	}
+		foreach (var line in this.originalCosmos) {
+			WriteLineWithColoredLetter(line, '#', ConsoleColor.Green);
+		}
     }
 
 	public void PrintExpandedCosmos() {
 		foreach (var line in this.expandedCosmos) {
-			Console.WriteLine(line);
+			WriteLineWithColoredLetter(line, '#', ConsoleColor.Green);
 		}
 	}
     
@@ -29,8 +29,26 @@ public class Cosmos {
     
     	return (expandedColumns, expandedRows);
     }
-    
-    // Expand columns if they don't contain a #
+
+	public int CountAmountOfUniverse() {
+		return this.originalCosmos.SelectMany(t => t).Count(t => t == '#');
+	}
+	
+	static void WriteLineWithColoredLetter(string letters, char c, ConsoleColor color) {
+		var index = letters.IndexOf(c);
+		var startIndex = 0;
+		while (index > -1) {
+			Console.Write(letters.Substring(startIndex, index - startIndex));
+			Console.ForegroundColor = color;
+			Console.Write(letters[letters.IndexOf(c)]);
+			Console.ResetColor();
+			startIndex = index + 1;
+			index = letters.IndexOf(c, startIndex);
+		}
+		Console.WriteLine(letters[startIndex..]);
+	}
+
+	// Expand columns if they don't contain a #
     static int ExpandColumns(List<string> grid) {
     	var sb = new StringBuilder();
     	var expandedColumns = 0;

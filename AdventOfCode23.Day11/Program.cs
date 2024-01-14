@@ -19,4 +19,6 @@ Console.WriteLine($"Expanding rows by {expanded.Item2}");
 Console.WriteLine("\nExpanded:");
 cosmos.PrintExpandedCosmos();
 
+Console.WriteLine($"\nAmount of universes: {cosmos.CountAmountOfUniverse()}");
+
 return 0;
