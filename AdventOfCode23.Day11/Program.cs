@@ -1,7 +1,7 @@
 ﻿using AdventOfCode23.Day11;
 using AdventOfCode23.Shared;
 
-var lines = await FileHelper.ValidateAndReadInputFileAsync("Input.txt");
+var lines = await FileHelper.ValidateAndReadInputFileAsync(args.Length > 0 ? args[0] : "Input.txt");
 if (lines.Length < 1) {
 	return -1;
 }
