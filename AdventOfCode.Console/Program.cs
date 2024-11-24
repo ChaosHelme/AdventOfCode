@@ -11,12 +11,14 @@ Console.CancelKeyPress += (_, _) => cancellationTokenSource.Cancel();
 
 var modules = AdventOfCodeModuleLoader.LoadModules();
 
-var selectedAoCYer = AnsiConsole.Prompt(new TextPrompt<int>("What would you like to do?")
-	.AddChoices(modules.Keys));
+var selectedAoCYear = AnsiConsole.Prompt(new SelectionPrompt<int>()
+	.AddChoices(modules.Keys)
+	.Title("Select which year of AoC you want"));
 
 var selectedModule = AnsiConsole.Prompt(new SelectionPrompt<IAdventOfCodeModule>()
-	.AddChoices(modules[selectedAoCYer])
+	.Title("Select a module")
+	.AddChoices(modules[selectedAoCYear])
 	.UseConverter(m => m.Name));
 
-var inputFile = await FileHelper.ValidateAndReadInputFileAsync("", cancellationToken);
+var inputFile = await FileHelper.ValidateAndReadInputFileAsync("Input.txt", cancellationToken);
 await selectedModule.RunAsync(inputFile, cancellationToken);
