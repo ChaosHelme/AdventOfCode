@@ -1,9 +1,11 @@
-﻿namespace AdventOfCode.Shared;
+﻿using System.Reflection;
+
+namespace AdventOfCode.Shared;
 
 public static class FileHelper {
-	public static async Task<string[]> ValidateAndReadInputFileAsync(string path) {
+	public static async Task<string[]> ValidateAndReadInputFileAsync(string path, CancellationToken cancellationToken) {
 		try {
-			var lines = await File.ReadAllLinesAsync(path);
+			var lines = await File.ReadAllLinesAsync(path, cancellationToken);
 
 			if (lines.Length == 0) {
 				Console.ForegroundColor = ConsoleColor.Red;
