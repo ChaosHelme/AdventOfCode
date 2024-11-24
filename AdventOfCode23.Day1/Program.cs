@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using AdventOfCode23.Shared;
+using AdventOfCode.Shared;
 
 var lines = await FileHelper.ValidateAndReadInputFileAsync("Input.txt");
 if (lines.Length < 1) {
@@ -9,13 +9,14 @@ var numbers = new List<int>(lines.Length);
 char[] digits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
 // Part 1
-// numbers.AddRange(from line in lines
-// 	let firstDigit = line[line.IndexOfAny(digits)]
-// 	let lastDigit = line[line.LastIndexOfAny(digits)]
-// 	select int.Parse($"{firstDigit}{lastDigit}"));
-//
-// Console.WriteLine(string.Join(" + ", numbers));
-// Console.WriteLine($"The sum is: {numbers.Sum()}");
+numbers.AddRange(from line in lines
+	let firstDigit = line[line.IndexOfAny(digits)]
+	let lastDigit = line[line.LastIndexOfAny(digits)]
+	select int.Parse($"{firstDigit}{lastDigit}"));
+
+Console.WriteLine(string.Join(" + ", numbers));
+Console.WriteLine($"The sum is: {numbers.Sum()}");
+numbers.Clear();
 
 // Part 2
 var digitAsWordToDigit = new Dictionary<string, int> {

@@ -1,4 +1,4 @@
-﻿namespace AdventOfCode23.Shared;
+﻿namespace AdventOfCode.Shared;
 
 public static class FileHelper {
 	public static async Task<string[]> ValidateAndReadInputFileAsync(string path) {
@@ -9,7 +9,7 @@ public static class FileHelper {
 				Console.ForegroundColor = ConsoleColor.Red;
 				await Console.Error.WriteLineAsync($"Input file seems to contain no content: {path}");
 				Console.ResetColor();
-				return Array.Empty<string>();
+				return [];
 			}
 
 			return lines;
@@ -19,6 +19,6 @@ public static class FileHelper {
 			Console.ResetColor();
 		}
 
-		return Array.Empty<string>();
+		return [];
 	}
 }

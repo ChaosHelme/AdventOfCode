@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using AdventOfCode23.Shared;
+using AdventOfCode.Shared;
 
 var lines = await FileHelper.ValidateAndReadInputFileAsync("Input.txt");
 if (lines.Length < 1) {

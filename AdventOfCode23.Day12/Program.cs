@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using AdventOfCode23.Shared;
+using AdventOfCode.Shared;
 const int MOD = 1_000_000_007;
 
 var lines = await FileHelper.ValidateAndReadInputFileAsync(args.Length > 0 ? args[0] : "InputExample.txt");
