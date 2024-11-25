@@ -13,7 +13,7 @@ var modules = AdventOfCodeModuleLoader.LoadModules();
 
 var selectedAoCYear = AnsiConsole.Prompt(new SelectionPrompt<int>()
 	.AddChoices(modules.Keys)
-	.Title("Select which year of AoC you want"));
+	.Title("Select which [green]year[/] of AoC you want"));
 
 var selectedModule = AnsiConsole.Prompt(new SelectionPrompt<IAdventOfCodeModule>()
 	.Title("Select a module")

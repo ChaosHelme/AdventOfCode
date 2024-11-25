@@ -2,11 +2,7 @@ namespace AdventOfCode23.Day9;
 
 public class SequenceExtrapolator {
 
-    List<List<int>> Histories { get; }
-
-    public SequenceExtrapolator() {
-        this.Histories = new List<List<int>>();
-    }
+    List<List<int>> Histories { get; } = [];
 
     public void BuildHistories(List<int> sequence) {
         var differences = sequence;
