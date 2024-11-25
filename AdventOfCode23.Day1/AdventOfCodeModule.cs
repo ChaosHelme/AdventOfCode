@@ -16,6 +16,8 @@ public sealed class AdventOfCodeModule : IAdventOfCodeModule
         var numbers = new List<int>(input.Length);
         char[] digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         
+		Console.WriteLine("Part 1");
+		
         // Part 1
         numbers.AddRange(from line in input
         	let firstDigit = line[line.IndexOfAny(digits)]
@@ -26,6 +28,7 @@ public sealed class AdventOfCodeModule : IAdventOfCodeModule
         Console.WriteLine($"The sum is: {numbers.Sum()}");
         numbers.Clear();
         
+		Console.WriteLine("Part 2");
         // Part 2
         var digitAsWordToDigit = new Dictionary<string, int> {
         	{"one", 1},
@@ -47,7 +50,7 @@ public sealed class AdventOfCodeModule : IAdventOfCodeModule
         
         	firstDigit = int.Parse($"{line[firstIndexOfDigit]}");
         	lastDigit = int.Parse($"{line[lastIndexOfDigit]}");
-        
+			
         	var previousIndexOfDigitAsWord = int.MaxValue;
         	var previousLastIndexOfDigitAsWord = int.MinValue;
         	foreach (var digitAsWord in digitAsWordToDigit.Keys) {

@@ -16,13 +16,13 @@ public static class AdventOfCodeModuleLoader
 		var modules = assemblies
 			.SelectMany(a => a.GetTypes())
 			.Where(t => moduleType.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-			.Select(t => (IAdventOfCodeModule)Activator.CreateInstance(t))
+			.Select(t => (IAdventOfCodeModule)Activator.CreateInstance(t)!)
 			.ToList();
 
 		// Group modules by DateOnly
 		// And Order them by Day
 		return modules
-			.OrderBy(d => d.Day)
+			.OrderBy(m => m.Day)
 			.GroupBy(m => m.AoCYear.Year)
 			.ToDictionary(
 				g => g.Key,
