@@ -1,5 +1,7 @@
-My personal repository for the AOC 2023.
+My personal repository for the Advent of Code challenges.
 
-All tasks are implemented using .Net 8 and C#
+You can select which year of AoC you're interested in and then select on of the days to run.
 
-https://adventofcode.com/2023
+All tasks are implemented using .Net and C# / F#
+
+https://adventofcode.com
