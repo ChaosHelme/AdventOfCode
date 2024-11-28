@@ -11,9 +11,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Input.txt">
+      <None Remove="Input.txt" />
+      <EmbeddedResource Include="Input.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

@@ -7,9 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Update="Input.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="InputExample.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
@@ -17,6 +14,13 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AdventOfCode.Shared\AdventOfCode.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Input.txt" />
+      <EmbeddedResource Include="Input.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

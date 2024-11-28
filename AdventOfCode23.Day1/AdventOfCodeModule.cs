@@ -7,6 +7,7 @@ public sealed class AdventOfCodeModule : IAdventOfCodeModule
 	public DateOnly AoCYear => DateOnly.Parse("2023-12-01");
 	public int Day => 1;
 	public string Name => "*** Advent Of Code 23 Day 1 ***";
+	public string ResourceName => $"{this.GetType().Namespace}.Resources.Input.txt";
 
 	public ValueTask RunAsync(string[] input, CancellationToken cancellationToken)
 	{

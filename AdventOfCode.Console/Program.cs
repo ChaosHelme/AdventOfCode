@@ -32,14 +32,13 @@ var useIntegratedInputFile = AnsiConsole.Prompt(
 		.DefaultValue(true)
 		.WithConverter(choice => choice ? "y" : "n"));
 
-var filePath = "Input.txt";
+var inputFile = selectedModule.GetInput();
 if (!useIntegratedInputFile)
 {
-	filePath = AnsiConsole.Prompt(new TextPrompt<string>("Please specify an input file:")
+	var filePath = AnsiConsole.Prompt(new TextPrompt<string>("Please specify an input file:")
 		.Validate(path => !File.Exists(path) ? ValidationResult.Error($"File at '{path}' does not exist") : ValidationResult.Success()));
+	inputFile = await FileHelper.ValidateAndReadInputFileAsync(filePath, cancellationToken);
 }
-
-var inputFile = await FileHelper.ValidateAndReadInputFileAsync(filePath, cancellationToken);
 
 await AnsiConsole.Status()
 	.StartAsync("Running...", async ctx => 
