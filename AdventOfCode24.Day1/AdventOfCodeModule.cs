@@ -17,13 +17,21 @@ public class AdventOfCodeModule : IAdventOfCodeModule
         if (numbersRight.Length != numbersLeft.Length)
             throw new InvalidOperationException("List of numbers have different length");
 
-        var sum = 0;
-        for (var i = 0; i < numbersLeft.Length; i++)
+        var sum = numbersLeft.Select((t, i) => Math.Abs(t - numbersRight[i])).Sum();
+
+        AnsiConsole.MarkupLine($"[green]Part one[/]: {sum}");
+        
+        var occurrenceDictionary = numbersRight
+            .GroupBy(x => x)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        sum = 0;
+        foreach (var number in numbersLeft)
         {
-            sum += Math.Abs(numbersLeft[i] - numbersRight[i]);
+            sum += (number * occurrenceDictionary.GetValueOrDefault(number, 0));
         }
         
-        AnsiConsole.MarkupLine($"[green]Part one[/]: {sum}");
+        AnsiConsole.MarkupLine($"[green]Part two[/]: {sum}");
         return ValueTask.CompletedTask;
     }
 }
