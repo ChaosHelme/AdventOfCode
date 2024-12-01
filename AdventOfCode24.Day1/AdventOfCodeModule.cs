@@ -25,12 +25,8 @@ public class AdventOfCodeModule : IAdventOfCodeModule
             .GroupBy(x => x)
             .ToDictionary(g => g.Key, g => g.Count());
 
-        sum = 0;
-        foreach (var number in numbersLeft)
-        {
-            sum += (number * occurrenceDictionary.GetValueOrDefault(number, 0));
-        }
-        
+        sum = numbersLeft.Sum(number => (number * occurrenceDictionary.GetValueOrDefault(number, 0)));
+
         AnsiConsole.MarkupLine($"[green]Part two[/]: {sum}");
         return ValueTask.CompletedTask;
     }
