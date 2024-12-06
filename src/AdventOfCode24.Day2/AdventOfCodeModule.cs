@@ -23,7 +23,7 @@ public class AdventOfCodeModule : IAdventOfCodeModule
 		for (var i = 0; i < input.Length; i++)
 		{
 			var row = input[i];
-			var report = new Report(row.Split(' ').AsSpan());
+			var report = new Report(row.AsSpan());
 			var isValid = report.IsValid();
 			if (isValid)
 				validReports++;
@@ -34,30 +34,33 @@ public class AdventOfCodeModule : IAdventOfCodeModule
 	}
 }
 
-internal readonly ref struct Report(Span<string> report)
+internal readonly ref struct Report(ReadOnlySpan<char> report)
 {
-	readonly Span<string> _report = report;
-    
+	readonly ReadOnlySpan<char> _report = report;
+
 	public bool IsValid()
 	{
-		if (_report.Length < 2) return false;
+		Span<Range> reports = stackalloc Range[_report.Length];
+		var ranges = _report.Split(reports, ' ', StringSplitOptions.RemoveEmptyEntries);
+
+		if (ranges < 2) return false;
 
 		var isIncreasing = false;
 		var isDecreasing = false;
-		
-		for (var i = 1; i < _report.Length; i++)
+
+		for (var i = 1; i < ranges; i++)
 		{
-			var current = int.Parse(_report[i - 1]);
-			var next = int.Parse(_report[i]);
-			var sign = Math.Sign(next-current);
-			var diff = Math.Abs(current-next);
-			
+			var current = int.Parse(_report[reports[i - 1]]);
+			var next = int.Parse(_report[reports[i]]);
+			var sign = Math.Sign(next - current);
+			var diff = Math.Abs(current - next);
+
 			if (diff <= 0 || diff >= 4)
-				return false; 
-			
+				return false;
+
 			isIncreasing |= sign == 1;
 			isDecreasing |= sign == -1;
-			
+
 			switch (sign)
 			{
 				case 0:
