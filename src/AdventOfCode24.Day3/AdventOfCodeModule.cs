@@ -12,15 +12,18 @@ public partial class AdventOfCodeModule : IAdventOfCodeModule<long>
 
 	public ValueTask RunAsync(string[] input, CancellationToken cancellationToken)
 	{
-		AnsiConsole.MarkupLine("[yellow]Advent of Code 24: Day 3[/]\n");
+		AnsiConsole.MarkupLine("[yellow]Advent of Code 24: Day 3[/]");
 		
 		var totalSum = PartOne(input);
-		AnsiConsole.MarkupLine($"[green]{totalSum}[/]\n");
+		AnsiConsole.MarkupLine($"Total mul sum: [green]{totalSum}[/]");
+		
+		totalSum = PartTwo(input);
+		AnsiConsole.MarkupLine($"Total fixed mul sum: [green]{totalSum}[/]");
 		
 		return ValueTask.CompletedTask;
 	}
 
-	[GeneratedRegex(@"mul\(([1-9]\d{0,2}),([1-9]\d{0,2})\)", RegexOptions.Compiled)]
+	[GeneratedRegex(@"mul\((\d{1,3}),(\d{1,3})\)", RegexOptions.Compiled)]
 	private static partial Regex MulRegex();
 	
 	[GeneratedRegex(@"do\(\)", RegexOptions.Compiled)]
@@ -66,6 +69,7 @@ public partial class AdventOfCodeModule : IAdventOfCodeModule<long>
 				currentSum += MulSum(line, ref startIndex, ref muleEnabled);
 			} while (startIndex > 0);
 			
+			AnsiConsole.MarkupLine($"The sum of all multiplications in line {i} is: [green]{currentSum}[/]");
 			totalSum += currentSum;
 		}
 
@@ -79,12 +83,12 @@ public partial class AdventOfCodeModule : IAdventOfCodeModule<long>
 		var dontMatch = DontRegex().Match(line, startIndex, line.Length - startIndex);
 		
 		startIndex = mulMatch.Index + mulMatch.Length;
-		if (!mulEnabled && doMatch.Index < dontMatch.Index)
+		mulEnabled = (mulMatch.Index < dontMatch.Index) || (!mulEnabled && doMatch.Index < mulMatch.Index && doMatch.Index > dontMatch.Index);
+		if (!mulEnabled)
 		{
 			return 0;
 		}
 		
-		mulEnabled = (mulMatch.Index < dontMatch.Index) || (doMatch.Index > dontMatch.Index && doMatch.Index > mulMatch.Index);
-		return mulEnabled ? int.Parse(mulMatch.Groups[1].Value) * int.Parse(mulMatch.Groups[2].Value) : 0L;
+		return int.Parse(mulMatch.Groups[1].Value) * int.Parse(mulMatch.Groups[2].Value);
 	}
 }
