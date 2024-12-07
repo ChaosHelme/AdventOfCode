@@ -3,7 +3,7 @@ using Spectre.Console;
 
 namespace AdventOfCode24.Day2;
 
-public class AdventOfCodeModule : IAdventOfCodeModule
+public class AdventOfCodeModule : IAdventOfCodeModule<int>
 {
 	public DateOnly AoCYear => DateOnly.Parse("2024-12-02");
 	public int Day => 2;

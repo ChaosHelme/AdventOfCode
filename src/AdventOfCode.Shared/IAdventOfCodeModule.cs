@@ -19,16 +19,22 @@ public interface IAdventOfCodeModule
 		using var reader = new StreamReader(stream);
 		return reader.ReadToEnd().Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
 	}
+	
+	ValueTask RunAsync(string[] input, CancellationToken cancellationToken);
+}
 
-	public int PartOne(string[] input)
+public interface IAdventOfCodeModule<out T> : IAdventOfCodeModule
+	where T : IComparable
+{
+	public T PartOne(string[] input)
 	{
-		return 0;
+		return default!;
 	}
 
-	public int PartTwo(string[] input)
+	public T PartTwo(string[] input)
 	{
-		return 0;
+		return default!;
 	}
 
-ValueTask RunAsync(string[] input, CancellationToken cancellationToken);
+	
 }

@@ -4,7 +4,7 @@ namespace AdventOfCode24.Day2.Tests;
 
 public class AdventOfCodeTests
 {
-	readonly IAdventOfCodeModule _adventOfCodeModule = new AdventOfCodeModule();
+	readonly IAdventOfCodeModule<int> _adventOfCodeModule = new AdventOfCodeModule();
 	
 	[TestCase((object) new []
 	{
