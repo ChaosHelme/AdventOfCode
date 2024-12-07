@@ -8,17 +8,29 @@ public class AdventOfCodeTests
 	
 	[TestCase((object) new []
 	{
-		"45 46 44 58 55",
+		"7 6 4 2 1",
+		"1 2 7 8 9",
+		"9 7 6 2 1",
+		"1 3 2 4 5",
+		"8 6 4 4 1",
+		"1 3 6 7 9"
+	}, ExpectedResult = 2 )]
+	public int Part1(string[] input)
+	{
+		return _adventOfCodeModule.PartOne(input);
+	}
+
+	[TestCase((object) new []
+	{
 		"7 6 4 2 1",
 		"1 2 7 8 9",
 		"9 7 6 2 1",
 		"1 3 2 4 5",
 		"8 6 4 4 1",
 		"1 3 6 7 9",
-		"10 11 12 13 14"
-	}, ExpectedResult = 3 )]
-	public int Part1(string[] input)
+	}, ExpectedResult = 4 )]
+	public int Part2(string[] input)
 	{
-		return this._adventOfCodeModule.PartOne(input);
+		return _adventOfCodeModule.PartTwo(input);
 	}
 }

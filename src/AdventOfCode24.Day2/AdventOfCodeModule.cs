@@ -14,44 +14,111 @@ public class AdventOfCodeModule : IAdventOfCodeModule
 		var validReports = PartOne(input);
 
 		AnsiConsole.MarkupLine($"Total safe reports: [green]{validReports}[/]");
+
+		validReports = PartTwo(input);
+
+		AnsiConsole.MarkupLine($"Total safe reports after using problem damper: [green]{validReports}[/]");
 		return ValueTask.CompletedTask;
 	}
 
+	readonly HashSet<int> _unsafeReportLines = [];
+	int _safeReportsPartOne;
+
 	public int PartOne(string[] input)
 	{
-		var validReports = 0;
+		AnsiConsole.MarkupLine("[yellow]Part One[/]");
 		for (var i = 0; i < input.Length; i++)
 		{
 			var row = input[i];
 			var report = new Report(row.AsSpan());
 			var isValid = report.IsValid();
 			if (isValid)
-				validReports++;
-			
+			{
+				_safeReportsPartOne++;
+			} else
+			{
+				_unsafeReportLines.Add(i);
+			}
+
 			AnsiConsole.MarkupLine($"Report on line {i} is: {(isValid ? "[green]Safe[/]" : "[red]Unsafe[/]")}");
 		}
-		return validReports;
+
+		return _safeReportsPartOne;
 	}
-}
 
-internal readonly ref struct Report(ReadOnlySpan<char> report)
-{
-	readonly ReadOnlySpan<char> _report = report;
-
-	public bool IsValid()
+	public int PartTwo(string[] input)
 	{
-		Span<Range> reports = stackalloc Range[_report.Length];
-		var ranges = _report.Split(reports, ' ', StringSplitOptions.RemoveEmptyEntries);
-
-		if (ranges < 2) return false;
-
-		var isIncreasing = false;
-		var isDecreasing = false;
-
-		for (var i = 1; i < ranges; i++)
+		if (_unsafeReportLines.Count <= 0)
 		{
-			var current = int.Parse(_report[reports[i - 1]]);
-			var next = int.Parse(_report[reports[i]]);
+			PartOne(input);
+		}
+
+		AnsiConsole.MarkupLine("[yellow]Part Two[/]");
+		var safeReportsPartTwo = 0;
+		foreach (var unsafeReportLine in _unsafeReportLines)
+		{
+			var report = new Report(input[unsafeReportLine].AsSpan());
+			var isValid = report.IsValidWithRemoval();
+			if (isValid)
+				safeReportsPartTwo++;
+
+			AnsiConsole.MarkupLine($"Report on line {unsafeReportLine} is now: {(isValid ? "[green]Safe[/]" : "[red]Unsafe[/]")}");
+		}
+
+		return safeReportsPartTwo + _safeReportsPartOne;
+	}
+
+	readonly ref struct Report(ReadOnlySpan<char> report)
+	{
+		readonly ReadOnlySpan<char> _report = report;
+
+		public bool IsValid() => IsValidInternal(-1);
+
+		public bool IsValidWithRemoval()
+		{
+			for (var i = 0; i < _report.Length; i++)
+			{
+				if (IsValidInternal(i))
+					return true;
+			}
+
+			return false;
+		}
+
+		private bool IsValidInternal(int skipIndex)
+		{
+			Span<Range> reports = stackalloc Range[_report.Length];
+			var ranges = _report.Split(reports, ' ', StringSplitOptions.RemoveEmptyEntries);
+
+			if (ranges < 2)
+				return false;
+
+			var isIncreasing = false;
+			var isDecreasing = false;
+			int? previousValue = null;
+
+			for (var i = 0; i < ranges; i++)
+			{
+				if (i == skipIndex)
+					continue;
+
+				var current = int.Parse(_report[reports[i]]);
+
+				if (previousValue.HasValue)
+				{
+					var isValid = IsValid(previousValue.Value, current, ref isIncreasing, ref isDecreasing);
+					if (!isValid)
+						return false;
+				}
+
+				previousValue = current;
+			}
+
+			return (isIncreasing && !isDecreasing) || (!isIncreasing && isDecreasing);
+		}
+
+		static bool IsValid(int current, int next, ref bool isIncreasing, ref bool isDecreasing)
+		{
 			var sign = Math.Sign(next - current);
 			var diff = Math.Abs(current - next);
 
@@ -68,8 +135,8 @@ internal readonly ref struct Report(ReadOnlySpan<char> report)
 				case > 0 when isDecreasing:
 					return false;
 			}
-		}
 
-		return isIncreasing || isDecreasing;
+			return true;
+		}
 	}
 }

@@ -6,7 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <RootNamespace>AdventOfCode24.Day2.Tets</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
