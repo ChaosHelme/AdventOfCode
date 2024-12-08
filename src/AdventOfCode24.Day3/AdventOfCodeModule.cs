@@ -60,13 +60,12 @@ public partial class AdventOfCodeModule : IAdventOfCodeModule<long>
 		for (var i = 0; i < input.Length; i++)
 		{
 			var startIndex = 0;
-			var line = input[i];
 			var currentSum = 0L;
 			var muleEnabled = true;
 			
 			do
 			{
-				currentSum += MulSum(line, ref startIndex, ref muleEnabled);
+				currentSum += MulSum(input[i], ref startIndex);
 			} while (startIndex > 0);
 			
 			AnsiConsole.MarkupLine($"The sum of all multiplications in line {i} is: [green]{currentSum}[/]");
@@ -75,20 +74,29 @@ public partial class AdventOfCodeModule : IAdventOfCodeModule<long>
 
 		return totalSum;
 	}
-
-	static long MulSum(string line, ref int startIndex, ref bool mulEnabled)
+	
+	int _lastDoIndex = -1;
+	int _lastDontIndex = -1;
+	long MulSum(string line, ref int startIndex)
 	{
-		var mulMatch = MulRegex().Match(line, startIndex, line.Length - startIndex);
-		var doMatch = DoRegex().Match(line, startIndex, line.Length - startIndex);
-		var dontMatch = DontRegex().Match(line, startIndex, line.Length - startIndex);
+		var mulMatch = MulRegex().Match(line, startIndex);
+		var doMatch = DoRegex().Match(line, startIndex);
+		var dontMatch = DontRegex().Match(line, startIndex);
+
+		if (_lastDoIndex < doMatch.Index)
+			_lastDoIndex = doMatch.Index;
+		if (_lastDontIndex < dontMatch.Index)
+			_lastDontIndex = dontMatch.Index;
 		
-		startIndex = mulMatch.Index + mulMatch.Length;
-		mulEnabled = (mulMatch.Index < dontMatch.Index) || (!mulEnabled && doMatch.Index < mulMatch.Index && doMatch.Index > dontMatch.Index);
-		if (!mulEnabled)
+		if (!mulMatch.Success)
 		{
-			return 0;
+			startIndex = -1;
+			return 0L;
 		}
+		startIndex = mulMatch.Index + mulMatch.Length;
 		
-		return int.Parse(mulMatch.Groups[1].Value) * int.Parse(mulMatch.Groups[2].Value);
+		return mulMatch.Index < _lastDontIndex || (mulMatch.Index > _lastDoIndex && _lastDoIndex > _lastDontIndex)
+			? int.Parse(mulMatch.Groups[1].Value) * int.Parse(mulMatch.Groups[2].Value) 
+			: 0L; 
 	}
 }
