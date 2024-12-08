@@ -11,7 +11,11 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
 
 	public ValueTask RunAsync(string[] input, CancellationToken cancellationToken)
 	{
+        AnsiConsole.MarkupLine($"[yellow]{Name}[/]");
+        AnsiConsole.MarkupLine("[green]Part one[/]");
 		PartOne(input);
+        AnsiConsole.MarkupLine("[green]Part two[/]");
+        PartTwo(input);
         
         return ValueTask.CompletedTask;
 	}
@@ -21,17 +25,24 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
         var xmasPositions = FindAllXmas(input);
         AnsiConsole.MarkupLine($"Total XMAS occurrences: [green]{xmasPositions.Count}[/]");
         
-        PrintResultGrid(input, xmasPositions);
+        PrintResultGridPartOne(input, xmasPositions);
         
         return xmasPositions.Count;
 	}
+
+    public int PartTwo(string[] input)
+    {
+        var crossMasCount = CountCrossMas(input);
+        AnsiConsole.MarkupLine($"Total CrossMas occurrences: [green]{crossMasCount}[/]");
+        return crossMasCount;
+    }
 	
 	static List<(int, int, int, int)> FindAllXmas(string[] grid)
     {
         var positions = new List<(int, int, int, int)>();
         var rows = grid.Length;
         var cols = grid[0].Length;
-        var target = "XMAS";
+        const string Target = "XMAS";
 
         for (var r = 0; r < rows; r++)
         {
@@ -39,7 +50,7 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
             {
                 foreach (var (dr, dc) in Directions)
                 {
-                    if (CheckWord(grid, r, c, dr, dc, target))
+                    if (CheckWord(grid, r, c, dr, dc, Target))
                     {
                         positions.Add((r, c, r + 3 * dr, c + 3 * dc));
                     }
@@ -58,15 +69,13 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
         return word.Select((ch, i) => grid[r + i * dr][c + i * dc] == ch).All(match => match);
     }
 
-    static bool IsInBounds(string[] grid, int r, int c)
-    {
-        return r >= 0 && r < grid.Length && c >= 0 && c < grid[0].Length;
-    }
+    static bool IsInBounds(string[] grid, int r, int c) 
+        => r >= 0 && r < grid.Length && c >= 0 && c < grid[0].Length;
 
     static IEnumerable<(int, int)> Directions 
         => [(0, 1), (1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1), (-1, 0), (0, -1)];
 
-    static void PrintResultGrid(string[] grid, List<(int, int, int, int)> positions)
+    static void PrintResultGridPartOne(string[] grid, List<(int, int, int, int)> positions)
     {
         var result = new char[grid.Length, grid[0].Length];
         for (var i = 0; i < grid.Length; i++)
@@ -87,5 +96,32 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
                 Console.Write(result[i, j]);
             AnsiConsole.WriteLine();
         }
+    }
+    
+    static int CountCrossMas(string[] grid)
+    {
+        var count = 0;
+        string[] patterns = ["MSAMS", "SMASM", "SSAMM", "MMASS"];
+
+        for (var row = 1; row < grid.Length - 1; row++)
+        {
+            for (var col = 1; col < grid[row].Length - 1; col++)
+            {
+                if (grid[row][col] != 'A')
+                    continue;
+
+                if (patterns.Any(pattern => CheckPattern(grid, row, col, pattern)))
+                    count++;
+            }
+        }
+        return count;
+    }
+
+    static bool CheckPattern(string[] grid, int row, int col, string pattern)
+    {
+        return grid[row-1][col-1] == pattern[0] &&
+            grid[row-1][col+1] == pattern[1] &&
+            grid[row+1][col-1] == pattern[3] &&
+            grid[row+1][col+1] == pattern[4];
     }
 }

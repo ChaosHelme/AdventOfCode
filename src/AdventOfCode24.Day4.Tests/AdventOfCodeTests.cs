@@ -23,4 +23,22 @@ public class AdventOfCodeTests
 	{
 		return _adventOfCodeModule.PartOne(input);
 	}
+	
+	[TestCase( (object) new[]
+	{
+		"MMMSXXMASM",
+		"MSAMXMSMSA",
+		"AMXSXMAAMM",
+		"MSAMASMSMX",
+		"XMASAMXAMM",
+		"XXAMMXXAMA",
+		"SMSMSASXSS",
+		"SAXAMASAAA",
+		"MAMMMXMMMM",
+		"MXMXAXMASX"
+	}, ExpectedResult = 9)]
+	public int PartTwo(string[] input)
+	{
+		return _adventOfCodeModule.PartTwo(input);
+	}
 }
