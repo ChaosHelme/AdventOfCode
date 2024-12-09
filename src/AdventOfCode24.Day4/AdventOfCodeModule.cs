@@ -1,4 +1,5 @@
-﻿using AdventOfCode.Shared;
+﻿using System.Text;
+using AdventOfCode.Shared;
 using Spectre.Console;
 
 namespace AdventOfCode24.Day4;
@@ -32,7 +33,7 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
 
     public int PartTwo(string[] input)
     {
-        var crossMasCount = CountCrossMas(input);
+        var crossMasCount = PrintAndCountCrossMas(input);
         AnsiConsole.MarkupLine($"Total CrossMas occurrences: [green]{crossMasCount}[/]");
         return crossMasCount;
     }
@@ -90,32 +91,54 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
                 result[startR + i * dr, startC + i * dc] = grid[startR + i * dr][startC + i * dc];
         }
 
+        var sb = new StringBuilder();
         for (var i = 0; i < grid.Length; i++)
         {
             for (var j = 0; j < grid[0].Length; j++)
-                Console.Write(result[i, j]);
-            AnsiConsole.WriteLine();
+                sb.Append(result[i, j]);
+            sb.AppendLine();
         }
+        AnsiConsole.WriteLine(sb.ToString());
     }
     
-    static int CountCrossMas(string[] grid)
+    static int PrintAndCountCrossMas(string[] grid)
     {
         var count = 0;
+        var result = new char[grid.Length, grid[0].Length];
         string[] patterns = ["MSAMS", "SMASM", "SSAMM", "MMASS"];
 
-        for (var row = 1; row < grid.Length - 1; row++)
+        for (var r = 1; r < grid.Length - 1; r++)
         {
-            for (var col = 1; col < grid[row].Length - 1; col++)
+            for (var c = 1; c < grid[r].Length - 1; c++)
             {
-                if (grid[row][col] != 'A')
+                result[r, c] = '.';
+                if (grid[r][c] != 'A')
                     continue;
 
-                if (patterns.Any(pattern => CheckPattern(grid, row, col, pattern)))
-                    count++;
+                if (!patterns.Any(pattern => CheckPattern(grid, r, c, pattern)))
+                    continue;
+
+                count++;
+                result[r, c] = 'A';
+                result[r-1, c-1] = grid[r-1][c-1];
+                result[r-1, c+1] = grid[r-1][c+1];
+                result[r+1, c-1] = grid[r+1][c-1];
+                result[r+1, c+1] = grid[r+1][c+1];
             }
         }
+
+        var sb = new StringBuilder();
+        for (var r = 0; r < grid.Length; r++)
+        {
+            for (var c = 0; c < grid[r].Length; c++)
+                sb.Append(result[r, c]);
+            sb.AppendLine();
+        }
+        AnsiConsole.WriteLine(sb.ToString());
+
         return count;
     }
+
 
     static bool CheckPattern(string[] grid, int row, int col, string pattern)
     {
