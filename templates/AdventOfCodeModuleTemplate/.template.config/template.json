@@ -1,0 +1,28 @@
+{
+    "author": "Markus Bohnert",
+    "name": "Advent Of Code Module",
+    "description": "A project for creating an Advent Of Code Module",
+    "identity": "AdventOfCode.Module.1.0",
+    "shortName": "adventofcodemodule",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "sourceName": "AdventOfCodeModuleTemplate",
+    "symbols": {
+        "Framework": {
+            "type": "parameter",
+            "description": "The target framework for the project.",
+            "datatype": "choice",
+            "choices": [
+                {
+                    "choice": "net9.0"
+                },
+                {
+                    "choice": "net8.0"
+                }
+            ],
+            "defaultValue": "net9.0"
+        }
+    }
+}
