@@ -23,16 +23,15 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
 		var updateOrders = ExtractUpdateOrdersFromInput(input);
 		var updateSequences = ExtractUpdateSequencesFromInput(input, updateOrders.Count);
 
-		var updateOrder = new UpdateOrder(0, 0);
+		var updateOrder = new ValueTuple<int, int>(0, 0);
 		var sum = 0;
 		foreach (var updateSequence in updateSequences)
 		{
 			var valid = true;
 			for (var i = 1; i < updateSequence.Sequence.Length; i++)
 			{
-				updateOrder.Start = updateSequence.Sequence[i-1];
-				updateOrder.End = updateSequence.Sequence[i];
-
+				updateOrder.Item1 = updateSequence.Sequence[i - 1];
+				updateOrder.Item2 = updateSequence.Sequence[i];
 				if (updateOrders.Contains(updateOrder))
 					continue;
 
@@ -69,21 +68,15 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
 				})
 			.ToArray();
 
-	static ImmutableHashSet<UpdateOrder> ExtractUpdateOrdersFromInput(string[] input) 
+	static ImmutableHashSet<ValueTuple<int, int>> ExtractUpdateOrdersFromInput(string[] input) 
 		=> input
 			.TakeWhile(line => line.Contains('|'))
 			.Select(line =>
 			{
 				var parts = line.Split('|');
-				return new UpdateOrder
-				{
-					Start = int.Parse(parts[0]),
-					End = int.Parse(parts[1]),
-				};
+				return new ValueTuple<int, int>(int.Parse(parts[0]), int.Parse(parts[1]));
 			})
 			.ToImmutableHashSet();
-
-	record struct UpdateOrder(int Start, int End);
 
 	record struct UpdateSequence(int[] Sequence);
 }
