@@ -70,7 +70,6 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
 						new UpdateOrderComparer(dependencyGraph))
 					.ToArray())
 			.Select(x => x[x.Length / 2])
-			.AsParallel()
 			.Sum();
 	}
 	
