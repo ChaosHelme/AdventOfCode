@@ -14,16 +14,20 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
 	{
 		var resultPartOne = PartOne(input);
 		AnsiConsole.MarkupLine($"The sum of all correct update sequences is: [green]{resultPartOne}[/]");
-		
+		var resultPartTwo = PartTwo(input);
+		AnsiConsole.MarkupLine($"The sum of all updated sequences is: [green]{resultPartTwo}[/]");
 		return ValueTask.CompletedTask;
 	}
-	
+
+	readonly List<UpdateSequence> _invalidUpdateSequences = [];
+	ImmutableHashSet<(int, int)> _updateOrders = [];
+
 	public int PartOne(string[] input)
 	{
-		var updateOrders = ExtractUpdateOrdersFromInput(input);
-		var updateSequences = ExtractUpdateSequencesFromInput(input, updateOrders.Count);
+		_updateOrders = ExtractUpdateOrdersFromInput(input);
+		var updateSequences = ExtractUpdateSequencesFromInput(input, _updateOrders.Count);
 
-		var updateOrder = new ValueTuple<int, int>(0, 0);
+		var updateOrder = ValueTuple.Create(0, 0);
 		var sum = 0;
 		foreach (var updateSequence in updateSequences)
 		{
@@ -32,10 +36,11 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
 			{
 				updateOrder.Item1 = updateSequence.Sequence[i - 1];
 				updateOrder.Item2 = updateSequence.Sequence[i];
-				if (updateOrders.Contains(updateOrder))
+				if (_updateOrders.Contains(updateOrder))
 					continue;
 
 				valid = false;
+				_invalidUpdateSequences.Add(updateSequence);
 				break;
 			}
 
@@ -51,7 +56,35 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
 
 	public int PartTwo(string[] input)
 	{
-		return 0;
+		if (_invalidUpdateSequences.Count <= 0)
+		{
+			PartOne(input);
+		}
+		
+		var dependencyGraph = BuildDependencyGraph(_updateOrders);
+
+		return _invalidUpdateSequences
+			.Select(u => u.Sequence)
+			.Select(invalidUpdateSequence =>
+				invalidUpdateSequence.OrderBy(x => x,
+						new UpdateOrderComparer(dependencyGraph))
+					.ToArray())
+			.Select(x => x[x.Length / 2])
+			.AsParallel()
+			.Sum();
+	}
+	
+	static Dictionary<int, HashSet<int>> BuildDependencyGraph(ImmutableHashSet<(int fromNode, int toNode)> updateOrders)
+	{
+		var graph = new Dictionary<int, HashSet<int>>();
+
+		foreach (var (fromNode, toNode) in updateOrders)
+		{
+			graph.TryAdd(fromNode, []);
+			graph[fromNode].Add(toNode);
+		}
+
+		return graph;
 	}
 	
 	static UpdateSequence[] ExtractUpdateSequencesFromInput(string[] input, int updateOrdersLength) 
@@ -79,4 +112,21 @@ public class AdventOfCodeModule : IAdventOfCodeModule<int>
 			.ToImmutableHashSet();
 
 	record struct UpdateSequence(int[] Sequence);
+
+	class UpdateOrderComparer(Dictionary<int, HashSet<int>> dependencyGraph) : IComparer<int>
+	{
+		public int Compare(int x, int y)
+		{
+			if (x == y) return 0;
+			
+			if (IsDependentOn(x, y)) return -1;
+
+			return 1;
+		}
+
+		bool IsDependentOn(int x, int y)
+		{
+			return dependencyGraph.TryGetValue(x, out var value) && value.Any(neighbor => neighbor == y);
+		}
+	}
 }
